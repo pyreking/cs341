@@ -68,10 +68,19 @@ int stop(Cmd *cp, char *arguments)
 
 int mem_display(Cmd *cp, char *arguments)
 {
-  //printf("Reached mem_display, passed argument string: |%s|\n", arguments);
-  //printf("        help message: %s\n", cp->help);
 
-  printf("First argument: %s\n", arguments);
+  unsigned int address;
+  int i = 0;
+  unsigned char *ptr;
+
+  sscanf(arguments, "%x", &address);
+  ptr = (unsigned char *)address;
+
+  printf("%08x\n", address);
+
+  for (i = 0; i < 16; i++) {
+    printf("%02x ", *(ptr++));
+  }
 
   
   return 0;			/* not done */
