@@ -70,19 +70,29 @@ int mem_display(Cmd *cp, char *arguments)
 {
 
   unsigned int address;
-  int i = 0;
-  unsigned char *ptr;
 
-  sscanf(arguments, "%x", &address);
-  ptr = (unsigned char *)address;
+  if (sscanf(arguments, "%x", &address) == 1) {
+    
+    printf("%08x    ", address);
 
-  printf("%08x\n", address);
+    unsigned char *p = arguments;
 
-  for (i = 0; i < 16; i++) {
-    printf("%02x ", *(ptr++));
+    //unsigned char *p;
+    //p = (unsigned char *) address;
+
+      for (int i = 0; i < 16; i++) {
+        printf("%02x ", *p++);
+      }
+
+      for (int i = 0; i < 16; i++) {
+        if (p[i] >= 0x20 && p[i] <= 0x7E) {
+          printf("%c", *p++);
+        } else {
+          printf(".");
+        }
+      }
+    printf("\n");
   }
-
-  
   return 0;			/* not done */
 }
 
