@@ -1,53 +1,55 @@
-00001160 t deregister_tm_clones
-000011a0 t register_tm_clones
-000011f0 t __do_global_dtors_aux
+000011a0 t deregister_tm_clones
+000011e0 t register_tm_clones
+00001230 t __do_global_dtors_aux
 00004060 b completed.7622
-00003ecc d __do_global_dtors_aux_fini_array_entry
-00001240 t frame_dummy
-00003ec8 d __frame_dummy_init_array_entry
-000023f8 r __FRAME_END__
-00003ecc d __init_array_end
-00003ed0 d _DYNAMIC
-00003ec8 d __init_array_start
-00002114 r __GNU_EH_FRAME_HDR
-00003fc8 d _GLOBAL_OFFSET_TABLE_
+00003ec4 d __do_global_dtors_aux_fini_array_entry
+00001280 t frame_dummy
+00003ec0 d __frame_dummy_init_array_entry
+000023f4 r __FRAME_END__
+00003ec4 d __init_array_end
+00003ec8 d _DYNAMIC
+00003ec0 d __init_array_start
+00002110 r __GNU_EH_FRAME_HDR
+00003fc0 d _GLOBAL_OFFSET_TABLE_
 00001000 t _init
-00001750 T __libc_csu_fini
+00001880 T __libc_csu_fini
 00004020 D cmds
          U strcmp@@GLIBC_2.0
          w _ITM_deregisterTMCloneTable
-00001150 T __x86.get_pc_thunk.bx
+00001190 T __x86.get_pc_thunk.bx
 00004000 W data_start
          U printf@@GLIBC_2.0
-000014ab T gettoken
+000014eb T gettoken
          U gets@@GLIBC_2.0
-00001755 T __x86.get_pc_thunk.bp
-0000134f T getcmd
+00001885 T __x86.get_pc_thunk.bp
+0000138f T getcmd
 00004060 D _edata
-00001778 T _fini
+000018a8 T _fini
          U __stack_chk_fail@@GLIBC_2.4
-000013d2 T slex
+00001412 T slex
 0000405c D pxyz
-00001553 T stop
-00001249 T __x86.get_pc_thunk.dx
+00001593 T stop
+00001289 T __x86.get_pc_thunk.dx
          w __cxa_finalize@@GLIBC_2.1.3
-000015a1 T mem_set
+000016ce T mem_set
 00004000 D __data_start
          U puts@@GLIBC_2.0
          w __gmon_start__
 00004004 D __dso_handle
 00002004 R _IO_stdin_used
          U __libc_start_main@@GLIBC_2.0
-000016e0 T __libc_csu_init
+00001810 T __libc_csu_init
+         U __isoc99_sscanf@@GLIBC_2.7
+         U putchar@@GLIBC_2.0
 00004064 B _end
-00001110 T _start
+00001150 T _start
 00002000 R _fp_hw
 00004060 B __bss_start
-0000124d T main
-0000154f T __x86.get_pc_thunk.ax
-0000156b T mem_display
-00001760 T __stack_chk_fail_local
-000015ef T help
+0000128d T main
+0000158f T __x86.get_pc_thunk.ax
+000015ab T mem_display
+00001890 T __stack_chk_fail_local
+0000171c T help
 00004060 D __TMC_END__
          w _ITM_registerTMCloneTable
 00004008 D xyz
