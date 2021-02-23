@@ -92,14 +92,25 @@ int mem_display(Cmd *cp, char *arguments)
       }
     }
     printf("\n");
+  } else{
+  printf("%8s    %s\n", cp->cmdtoken, cp->help);
   }
   return 0;			/* not done */
 }
 
 int mem_set(Cmd *cp, char *arguments)
 {
-  printf("Reached mem_display, passed argument string: |%s|\n", arguments);
-  printf("        help message: %s\n", cp->help);
+  unsigned int address;
+  unsigned int new_value;
+
+  if (sscanf(arguments, "%x %x", &address, &new_value) == 2) {
+    unsigned char *ptr;
+    ptr = (unsigned char *) address;
+    *ptr = new_value;
+  } else {
+    printf("%8s    %s\n", cp->cmdtoken, cp->help);
+  }
+  
   return 0;			/* not done */
 }
 
