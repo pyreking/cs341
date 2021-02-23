@@ -32,17 +32,17 @@ PC_LD    = ld -m elf_i386
 # change this to your homework folder
 PROJ = $(HOME)/cs341/mp1
 
-PC_OBJS = $(PROJ)/tutor.o $(PROJ)/slex.o
-UNIX_OBJS = $(PROJ)/tutor_u.o $(PROJ)/slex_u.o
+PC_OBJS = $(PROJ)/tutor.o $(PROJ)/slex.o $(PROJ)/cmds.o
+UNIX_OBJS = $(PROJ)/tutor_u.o $(PROJ)/slex_u.o $(PROJ)/cmds_u.o
 
 # SAPC executable--tell ld to start code at 0x100100, load special startup
 # module, special PC C libraries--
 
-tutor.lnx: $(PROJ)/cmds.o $(PC_OBJS) \
+tutor.lnx: $(PC_OBJS) \
 	$(PC_LIB)/startup0.o $(PC_LIB)/startup.o $(PC_LIB)/libc.a
 	$(PC_LD) -N -Ttext 100100 -o tutor.lnx \
 	$(PC_LIB)/startup0.o $(PC_LIB)/startup.o \
-	$(PC_OBJS) $(PROJ)/cmds.o $(PC_LIB)/libc.a
+	$(PC_OBJS) $(PC_LIB)/libc.a
 #
 	rm -f syms;$(PC_NM) -n tutor.lnx>syms
 
@@ -62,11 +62,11 @@ $(PROJ)/slex.o: $(PROJ)/slex.c $(PROJ)/slex.h
 # use stdio.h from the GNU C library
 # check "man gcc" to find out what -W flags do
 #
-CC = gcc -m32
-CFLAGS = -Wall -Wno-implicit -Wshadow -g
+CC =gcc -m32
+CFLAGS = -Wall -Wno-implicit -Wshadow -g 
 
-tutor:  $(UNIX_OBJS) $(PROJ)/cmds_u.o
-	$(CC) -g -o tutor $(UNIX_OBJS) $(PROJ)/cmds_u.o
+tutor:  $(UNIX_OBJS)
+	ld -m elf_i386 -o tutor $(UNIX_OBJS) -e main -dynamic-linker /lib/ld-linux.so.2 -lc
 #
 	rm -f usyms; nm -vpt x tutor > usyms
 
