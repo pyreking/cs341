@@ -68,36 +68,29 @@ int stop(Cmd *cp, char *arguments)
 
 int mem_display(Cmd *cp, char *arguments)
 {
-
   unsigned int address;
 
   if (sscanf(arguments, "%x", &address) == 1) {
     
     unsigned char *ptr;
-
     ptr = (unsigned char *) address;
 
     // Print the hex value of the memory address
     printf("%08x    ", ptr);
 
+    // Print out the hex values for the 16 bit address.
+    for (int i = 0; i < 16; i++) {
+      printf("%02x ", *(ptr + i));
+    }
 
-
-    //unsigned char *p;
-    //p = (unsigned char *) address;
-
-      // Print out the hex values for the 16 bit address.
-      for (int i = 0; i < 16; i++) {
-        //printf("%02x ", *p++);
+    // Print out ASCII
+    for (int i = 0; i < 16; i++) {
+      if (ptr[i] >= 0x20 && ptr[i] <= 0x7E) {
+        printf("%c", *(ptr + i));
+      } else {
+        printf(".");
       }
-
-      // Print out ASCII
-/*for (int i = 0; i < 16; i++) {
-        if (p[i] >= 0x20 && p[i] <= 0x7E) {
-          printf("%c", *p++);
-        } else {
-          printf(".");
-        }
-      } */
+    }
     printf("\n");
   }
   return 0;			/* not done */
