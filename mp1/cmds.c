@@ -101,7 +101,7 @@ int mem_display(Cmd *cp, char *arguments)
     // Cast the memory address to an unsigned char pointer and
     // assign it to the ptr pointer.
     ptr = (unsigned char *) address;
-
+  
     // Print the hexadecimal value of the memory address.
     printf("%08x    ", address);
 
