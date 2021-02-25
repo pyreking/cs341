@@ -1,0 +1,200 @@
+Question 1:
+
+I mostly tested the SAPC version of my program on the tutor
+machine because I was unable to run the Linux version of my
+program without crashing. I started testing the Linux version
+of my program after I successfully debugged all of the problems
+with the SAPC version. I later found out that I had to copy a 
+new makefile to my director on the CS department server in order
+to run the Linux version of my program successfully.
+
+I used VS code to write all of my code because it was faster for
+me than learning how to use vim. I am still interested in learning
+vim when I have more free time and I do not have a deadline
+to worry about.
+
+Question 2:
+
+The Linux version of my program has a segmentation fault when I try to
+use md on an address that does not correspond to a physical memory address.
+
+The Linux version of my program also has a segmentation fault when I try to
+use ms on an address that corresponds to part of my tutor code.
+
+The SAPC version of my program gives a “general protection violation” error when
+I try to use md on an address that does not correspond to a physical memory address.
+
+The SAPC version of my program allows me to use ms on an address that corresponds
+to part of my tutor code without giving an error.
+
+The answers are different on the Linux and SAPC version of my program.
+
+Question 3:
+
+a)
+
+On the SAPC version of my program, the memory address for the global xyz variable is 001023a0.
+The value is 06 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 when I used md on the memory address.
+
+On the Linux version of my program, the memory address for the global xyz variable is 0804c040.
+The value is 06 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 when I used md on the memory address.
+
+b)
+
+On the SAPC version of my program, the memory address for the pxyz pointer is 001023fc.
+The value is a0 23 10 00 00 00 00 00 00 00 00 00 00 10 01 00 when I used md on the memory address.
+The value is 001023a0 when I use mdd on the memory address, which is the same address as the global xyz variable.
+
+On the Linux version of my program, the memory address for the pxyz pointer is 0804c09c.
+The value is 40 c0 04 08 47 43 43 3a 20 28 55 62 75 6e 74 75 when I used md on the memory address.
+This corresponds to the memory address of the global xyz variable.
+
+c)
+
+On the SAPC version of my program, the memory address for the cmds array is 001023c0.
+The string pointer to md is 00101cae. The memory address for m is 00101cae, which has a value of 6d.
+The memory address for d is 00101caf, which has a value of 64. The memory address for the null termination of
+the string is 00101cb0, which has a value of 0.
+
+On the Linux version of my program, the memory address for the cmds array is 0804c060. The string pointer to md is 0804a042.
+The memory address for m is 0804a042, which has a value of 6d. The memory address for d is 0804a043, which has a value of 64.
+The memory address for the null termination of the string is 0804a044, which as a value of 0.
+
+d)
+
+On the SAPC version of my program, the memory address for the h command is 00101cec.
+I am able to change the memory address for the h command to be x while it is running.
+
+On the Linux version of my program, the memory address for the h command is  0804a080. I am not able to change
+the memory address for the h command while it is running because I get a segmentation fault.
+
+Question 4:
+
+SAPC memory codes:
+
+00100669 T breakpoint
+0010066b T clr_bss
+00100951 t delay
+00100c3b T devcontrol
+00100cce T devdescript
+00100d5e T devname
+00100de5 T _doscan
+001014e1 T _fdoprnt
+00100b3b T getc
+00101423 t _getccl
+00100226 T getcmd
+001007b3 T gets
+0010034d T gettoken
+001005a1 T help
+00100840 T init
+0010081f T init_devio
+00101062 t _innum
+001012d0 t _instr
+00101812 t .L20
+001017c2 t .L21
+00101717 t .L23
+001016c0 t .L24
+0010176f t .L25
+001016e6 t .L26
+0010169e t .L27
+001017ea t .L28
+0010179a t .L29
+00100140 T main
+00100408 T mem_display
+00100531 T mem_set
+0010067d T printf
+0010197a t _prtl10
+00101ab9 t _prtl16
+00101bdb t _prtl2
+00101a26 t _prtl8
+00101b4a t _prtX16
+0010097e T putc
+00100aae T rawgetc
+001008b9 T rawputc
+00100bae T readyc
+00100704 t sgetch
+001002a9 T slex
+001006bc T sscanf
+00100100 T _start
+00100110 T _startupc
+001003f0 T stop
+00100760 T strcmp
+0010073b t sungetch
+001003ec T __x86.get_pc_thunk.ax
+0010013c T __x86.get_pc_thunk.bx
+00100de1 T __x86.get_pc_thunk.cx
+0010081b T __x86.get_pc_thunk.di
+001014dd T __x86.get_pc_thunk.si
+
+Linux memory codes:
+
+080491f2 T getcmd
+08049352 T gettoken
+080495ec T help
+080490f0 T main
+08049412 T mem_display
+08049554 T mem_set
+0804c09c D pxyz
+08049279 T slex
+080496e0 T __stack_chk_fail_local
+080493fa T stop
+080493f6 T __x86.get_pc_thunk.ax
+08049275 T __x86.get_pc_thunk.bx
+
+Question 5:
+
+When I try to change the code on the SAPC version so that it crashes, I get a general protection violation. 
+
+When I try to change the code on the Linux version so that it crashes, I get a segmentation fault.
+
+
+Question 6:
+
+When I use rd on the SAPC version to find the location of the program stack,
+the %esp register can be found at 0005788C. When I try view the memory of the
+%esp register with md, I get 8c f9 06 00 00 00 05 00 29 01 05 00 00 00 00 00.
+This translates to 0006f98c 00050000 00050129 00000000 with mdd. I am able to
+change the values in the %esp register while the program is running without
+crashing.
+
+When I use gdb on the Linux version to find the location of the program stack,
+the %esp register can be found at 0xffffdca0 with a starting value of 0xffffdca0.
+When I try to view the memory of the %esp register with md, I get a segmentation fault.
+The %esp register changes location to 0xffffdb20 with a value of 0xffffdb20 when I
+interrupt the program using gdb.
+
+Question 7:
+
+I tried modifying random memory addresses on the SAPC version of my program to see if I
+could get the program to crash. It was surprisingly hard for me to crash the program because
+the tutor machine did not care about preventing me from changing values that would crash the
+Linux version of the program. I was occasionally able to crash the program when I tried modifying
+values in the sym file, such as the call to the scanf function.
+
+Part 8:
+
+I learned a lot about memory while working on this project. I feel more confident finding different
+memory addresses and manipulating them than I did before completing this project. It was definitely
+worth my time to complete this project because I gained a deeper understanding of how computer
+hardware works.
+
+The easiest part for me was completing the help function, which took me about an hour because I needed
+to understand how to parse commands using the slex function.
+
+The hardest part for me was completing the mem_display function because I did not know how to access and
+display memory addresses in C. The mem_set function was easy to complete after I figured out the mem_display
+function because the code from mem_display can be reused for mem_set.
+
+The most surprising part was the fact that I could edit the code of the SAPC version of my program while
+it was running without crashing it. I had a lot of fun modifying the h command to be different characters.
+
+The most interesting part was the fact that I could use md on the cmds array to find the pointers to each
+command. I feel like I gained a better understand of how pointers work in memory after completing that experiment.
+
+I was most slowed down by manipulating pointers in C. I found it frustrating to have to think about memory
+manipulation because I do not have to worry about it at all while programming in higher-level languages such Java.
+I probably would not program in C for my programs unless I needed to work with memory on a lower level. The process 
+for transferring my tutor.lnx file to the tutor VM was also slow and time-consuming.
+
+The project could be improved by reviewing C pointers during the first week of class. I found it hard to remember
+how to manipulate C pointers because I took CS240 in the Spring Semester of 2020.
