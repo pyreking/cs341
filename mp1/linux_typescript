@@ -1,23 +1,29 @@
-Script started on 2021-02-25 11:27:46-05:00 [TERM="xterm" TTY="/dev/pts/37" COLUMNS="80" LINES="23"]
+Script started on 2021-02-25 12:10:10-05:00 [TERM="xterm" TTY="/dev/pts/37" COLUMNS="80" LINES="23"]
 aguiney@pe15:~/cs341/mp1$ ls -al
-total 364
-drwxrwsr-x 2 aguiney cs341-1G   4096 Feb 25 11:27 .
+total 456
+drwxrwsr-x 2 aguiney cs341-1G   4096 Feb 25 12:10 .
 drwxrws--- 6 aguiney cs341-1G   4096 Feb 14 20:44 ..
 -rw-r--r-- 1 aguiney cs341-1G   7221 Feb 24 23:13 cmds.c
--rw-r--r-- 1 aguiney cs341-1G   7760 Feb 25 11:21 cmds_u.o
+-rw-r--r-- 1 aguiney cs341-1G   9356 Feb 25 11:34 cmds.o
+-rw-r--r-- 1 aguiney cs341-1G   7760 Feb 25 11:34 cmds_u.o
 -rw-r--r-- 1 aguiney cs341-1G   7999 Feb 25 11:12 discussion.txt
+-rw-r--r-- 1 aguiney cs341-1G  19346 Feb 25 11:36 linux_typescript
 -rw-r--r-- 1 aguiney cs341-1G   3029 Feb 23 14:44 makefile
 -rw-r--r-- 1 aguiney cs341-1G 257525 Feb  4 19:29 mp1.pdf
 -rw-r--r-- 1 aguiney cs341-1G  13728 Feb  4 19:29 Rubric.docx
+-rw-r--r-- 1 aguiney cs341-1G   4086 Feb 25 12:00 sapc_typescript
 -rw-r--r-- 1 aguiney cs341-1G   2471 Feb  4 19:29 slex.c
 -rw-r--r-- 1 aguiney cs341-1G   1846 Feb  4 19:29 slex.h
--rw-r--r-- 1 aguiney cs341-1G   6044 Feb 25 11:21 slex_u.o
--rw-r--r-- 1 aguiney cs341-1G   1228 Feb 24 22:33 syms
--rwxr-xr-x 1 aguiney cs341-1G  22108 Feb 25 11:21 tutor
+-rw-r--r-- 1 aguiney cs341-1G   7452 Feb 25 11:34 slex.o
+-rw-r--r-- 1 aguiney cs341-1G   6044 Feb 25 11:34 slex_u.o
+-rw-r--r-- 1 aguiney cs341-1G   1228 Feb 25 11:34 syms
+-rwxr-xr-x 1 aguiney cs341-1G  22108 Feb 25 11:34 tutor
 -rw-r--r-- 1 aguiney cs341-1G   2321 Feb  4 19:29 tutor.c
--rw-r--r-- 1 aguiney cs341-1G   6080 Feb 25 11:21 tutor_u.o
--rw-r--r-- 1 aguiney cs341-1G      0 Feb 25 11:27 typescript
--rw-r--r-- 1 aguiney cs341-1G    620 Feb 25 11:21 usyms
+-rwxr-xr-x 1 aguiney cs341-1G  40768 Feb 25 11:34 tutor.lnx
+-rw-r--r-- 1 aguiney cs341-1G   7556 Feb 25 11:34 tutor.o
+-rw-r--r-- 1 aguiney cs341-1G   6080 Feb 25 11:34 tutor_u.o
+-rw-r--r-- 1 aguiney cs341-1G      0 Feb 25 12:10 typescript
+-rw-r--r-- 1 aguiney cs341-1G    620 Feb 25 11:34 usyms
 aguiney@pe15:~/cs341/mp1$ cat discussion.txt
 Question 1:
 
@@ -474,6 +480,14 @@ ld -m elf_i386 -o tutor /home/aguiney/cs341/mp1/tutor_u.o /home/aguiney/cs341/mp
 ld: /home/aguiney/cs341/mp1/tutor_u.o: in function `getcmd':
 /home/aguiney/cs341/mp1/tutor.c:69: warning: the `gets' function is dangerous and should not be used.
 rm -f usyms; nm -vpt x tutor > usyms
+aguiney@pe15:~/cs341/mp1$ make
+gcc -DSAPC -gdwarf-2 -gstrict-dwarf -march=i586 -m32 -fno-builtin -fno-stack-protector -nostdlib     -c -Wall -I/home/cheungr/serl/tutor-linux/include  -c -o /home/aguiney/cs341/mp1/tutor.o /home/aguiney/cs341/mp1/tutor.c
+gcc -DSAPC -gdwarf-2 -gstrict-dwarf -march=i586 -m32 -fno-builtin -fno-stack-protector -nostdlib     -c -Wall -I/home/cheungr/serl/tutor-linux/include  -c -o /home/aguiney/cs341/mp1/slex.o /home/aguiney/cs341/mp1/slex.c
+gcc -DSAPC -gdwarf-2 -gstrict-dwarf -march=i586 -m32 -fno-builtin -fno-stack-protector -nostdlib     -c -Wall -I/home/cheungr/serl/tutor-linux/include  -c -o /home/aguiney/cs341/mp1/cmds.o /home/aguiney/cs341/mp1/cmds.c
+ld -m elf_i386 -N -Ttext 100100 -o tutor.lnx \
+/home/cheungr/serl/tutor-linux/libc/startup0.o /home/cheungr/serl/tutor-linux/libc/startup.o \
+/home/aguiney/cs341/mp1/tutor.o /home/aguiney/cs341/mp1/slex.o /home/aguiney/cs341/mp1/cmds.o /home/cheungr/serl/tutor-linux/libc/libc.a
+rm -f syms;nm -n tutor.lnx>syms
 aguiney@pe15:~/cs341/mp1$ ./tutor
      cmd    help message
       md    Memory display: MD <addr>
@@ -507,4 +521,4 @@ Segmentation fault (core dumped)
 aguiney@pe15:~/cs341/mp1$ exit
 exit
 
-Script done on 2021-02-25 11:30:27-05:00 [COMMAND_EXIT_CODE="139"]
+Script done on 2021-02-25 12:12:27-05:00 [COMMAND_EXIT_CODE="139"]
