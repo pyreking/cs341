@@ -1,30 +1,30 @@
-Script started on 2021-02-25 12:10:10-05:00 [TERM="xterm" TTY="/dev/pts/37" COLUMNS="80" LINES="23"]
+Script started on 2021-02-25 14:22:27-05:00 [TERM="xterm" TTY="/dev/pts/84" COLUMNS="80" LINES="24"]
 aguiney@pe15:~/cs341/mp1$ ls -al
-total 456
-drwxrwsr-x 2 aguiney cs341-1G   4096 Feb 25 12:10 .
+total 432
+drwxrwsr-x 2 aguiney cs341-1G   4096 Feb 25 14:22 .
 drwxrws--- 6 aguiney cs341-1G   4096 Feb 14 20:44 ..
 -rw-r--r-- 1 aguiney cs341-1G   7221 Feb 24 23:13 cmds.c
--rw-r--r-- 1 aguiney cs341-1G   9356 Feb 25 11:34 cmds.o
--rw-r--r-- 1 aguiney cs341-1G   7760 Feb 25 11:34 cmds_u.o
--rw-r--r-- 1 aguiney cs341-1G   7999 Feb 25 11:12 discussion.txt
--rw-r--r-- 1 aguiney cs341-1G  19346 Feb 25 11:36 linux_typescript
+-rw-r--r-- 1 aguiney cs341-1G   9356 Feb 25 14:18 cmds.o
+-rw-r--r-- 1 aguiney cs341-1G   7760 Feb 25 14:18 cmds_u.o
+-rw-r--r-- 1 aguiney cs341-1G   8020 Feb 25 14:16 discussion.txt
 -rw-r--r-- 1 aguiney cs341-1G   3029 Feb 23 14:44 makefile
 -rw-r--r-- 1 aguiney cs341-1G 257525 Feb  4 19:29 mp1.pdf
 -rw-r--r-- 1 aguiney cs341-1G  13728 Feb  4 19:29 Rubric.docx
--rw-r--r-- 1 aguiney cs341-1G   4086 Feb 25 12:00 sapc_typescript
 -rw-r--r-- 1 aguiney cs341-1G   2471 Feb  4 19:29 slex.c
 -rw-r--r-- 1 aguiney cs341-1G   1846 Feb  4 19:29 slex.h
--rw-r--r-- 1 aguiney cs341-1G   7452 Feb 25 11:34 slex.o
--rw-r--r-- 1 aguiney cs341-1G   6044 Feb 25 11:34 slex_u.o
--rw-r--r-- 1 aguiney cs341-1G   1228 Feb 25 11:34 syms
--rwxr-xr-x 1 aguiney cs341-1G  22108 Feb 25 11:34 tutor
--rw-r--r-- 1 aguiney cs341-1G   2321 Feb  4 19:29 tutor.c
--rwxr-xr-x 1 aguiney cs341-1G  40768 Feb 25 11:34 tutor.lnx
--rw-r--r-- 1 aguiney cs341-1G   7556 Feb 25 11:34 tutor.o
--rw-r--r-- 1 aguiney cs341-1G   6080 Feb 25 11:34 tutor_u.o
--rw-r--r-- 1 aguiney cs341-1G      0 Feb 25 12:10 typescript
--rw-r--r-- 1 aguiney cs341-1G    620 Feb 25 11:34 usyms
+-rw-r--r-- 1 aguiney cs341-1G   7452 Feb 25 14:18 slex.o
+-rw-r--r-- 1 aguiney cs341-1G   6044 Feb 25 14:18 slex_u.o
+-rw-r--r-- 1 aguiney cs341-1G   1228 Feb 25 14:18 syms
+-rwxr-xr-x 1 aguiney cs341-1G  22108 Feb 25 14:18 tutor
+-rw-r--r-- 1 aguiney cs341-1G   2297 Feb 25 14:12 tutor.c
+-rwxr-xr-x 1 aguiney cs341-1G  40768 Feb 25 14:18 tutor.lnx
+-rw-r--r-- 1 aguiney cs341-1G   7556 Feb 25 14:18 tutor.o
+-rw-r--r-- 1 aguiney cs341-1G   6080 Feb 25 14:18 tutor_u.o
+-rw-r--r-- 1 aguiney cs341-1G      0 Feb 25 14:22 typescript
+-rw-r--r-- 1 aguiney cs341-1G    620 Feb 25 14:18 usyms
 aguiney@pe15:~/cs341/mp1$ cat discussion.txt
+Name: Austin Guiney
+
 Question 1:
 
 I mostly tested the SAPC version of my program on the tutor
@@ -478,7 +478,7 @@ gcc -m32 -Wall -Wno-implicit -Wshadow -g  -c -o /home/aguiney/cs341/mp1/slex_u.o
 gcc -m32 -Wall -Wno-implicit -Wshadow -g  -c -o /home/aguiney/cs341/mp1/cmds_u.o /home/aguiney/cs341/mp1/cmds.c
 ld -m elf_i386 -o tutor /home/aguiney/cs341/mp1/tutor_u.o /home/aguiney/cs341/mp1/slex_u.o /home/aguiney/cs341/mp1/cmds_u.o -e main -dynamic-linker /lib/ld-linux.so.2 -lc
 ld: /home/aguiney/cs341/mp1/tutor_u.o: in function `getcmd':
-/home/aguiney/cs341/mp1/tutor.c:69: warning: the `gets' function is dangerous and should not be used.
+/home/aguiney/cs341/mp1/tutor.c:71: warning: the `gets' function is dangerous and should not be used.
 rm -f usyms; nm -vpt x tutor > usyms
 aguiney@pe15:~/cs341/mp1$ make
 gcc -DSAPC -gdwarf-2 -gstrict-dwarf -march=i586 -m32 -fno-builtin -fno-stack-protector -nostdlib     -c -Wall -I/home/cheungr/serl/tutor-linux/include  -c -o /home/aguiney/cs341/mp1/tutor.o /home/aguiney/cs341/mp1/tutor.c
@@ -512,13 +512,17 @@ UNIX-tutor> md 0804c040
 UNIX-tutor> ms 0804c040 ff
 UNIX-tutor> md 0804c040
 0804c040    ff 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+UNIX-tutor> md 0804c09c
+0804c09c    40 c0 04 08 47 43 43 3a 20 28 55 62 75 6e 74 75 @...GCC: (Ubuntu
 UNIX-tutor> md 0804c060
 0804c060    42 a0 04 08 12 94 04 08 45 a0 04 08 5f a0 04 08 B.......E..._...
 UNIX-tutor> md 0804a042
 0804a042    6d 64 00 4d 65 6d 6f 72 79 20 64 69 73 70 6c 61 md.Memory displa
+UNIX-tutor> md 0804a080
+0804a080    68 00 48 65 6c 70 3a 20 48 20 3c 63 6f 6d 6d 61 h.Help: H <comma
 UNIX-tutor> s
 Segmentation fault (core dumped)
 aguiney@pe15:~/cs341/mp1$ exit
 exit
 
-Script done on 2021-02-25 12:12:27-05:00 [COMMAND_EXIT_CODE="139"]
+Script done on 2021-02-25 14:24:39-05:00 [COMMAND_EXIT_CODE="139"]

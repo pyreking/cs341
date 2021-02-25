@@ -1,9 +1,9 @@
-Script started on Thu 25 Feb 2021 01:55:13 PM EST
+Script started on Thu 25 Feb 2021 02:44:43 PM EST
 tuser@tutor-vserver:~$ ls -al
-total 60
-drwxr-xr-x 8 tuser tuser 4096 Feb 25 13:55 [0m[01;34m.[0m
+total 64
+drwxr-xr-x 8 tuser tuser 4096 Feb 25 14:44 [0m[01;34m.[0m
 drwxr-xr-x 4 root  root  4096 Jul 20  2015 [01;34m..[0m
--rw------- 1 tuser tuser 3692 Feb 25 13:54 .bash_history
+-rw------- 1 tuser tuser 4203 Feb 25 14:39 .bash_history
 -rw-r--r-- 1 tuser tuser  220 Jul 20  2015 .bash_logout
 -rw-r--r-- 1 tuser tuser 3184 Jul 20  2015 .bashrc
 drwxr-xr-x 2 tuser tuser 4096 Jul 20  2015 [01;34m.emacs.d[0m
@@ -16,7 +16,7 @@ drwxr-sr-x 2 tuser tuser 4096 Jul 20  2015 [01;34mtestaout[0m
 drwxr-sr-x 2 tuser tuser 4096 Jul 20  2015 [01;34mtestelf[0m
 -rw-r--r-- 1 tuser tuser  688 Jul 20  2015 testelf.syms
 -rw-r--r-- 1 tuser tuser   67 Jul 20  2015 test.s
--rw-r--r-- 1 tuser tuser    0 Feb 25 13:55 typescript
+-rw-r--r-- 1 tuser tuser    0 Feb 25 14:44 typescript
 tuser@tutor-vserver:~$ scp aguiney@users.cs.umb.edu:~/cs341/mp1/tutor.lnx .
 aguiney@users.cs.umb.edu's password: 
 tutor.lnx                                       0%    0     0.0KB/s   --:-- ETAtutor.lnx                                     100%   40KB  39.8KB/s   00:00    
@@ -98,8 +98,8 @@ Exception 3 at EIP=00100110: Breakpoint
 Tutor> 
 Tutor> 
 Quit handler: 
-killing process 1828 Leaving board #1
+killing process 1780 Leaving board #1
 tuser@tutor-vserver:~$ exit
 exit
 
-Script done on Thu 25 Feb 2021 01:59:57 PM EST
+Script done on Thu 25 Feb 2021 02:48:47 PM EST
