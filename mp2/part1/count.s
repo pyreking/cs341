@@ -5,11 +5,11 @@ count:
     movl %esp,%ebp # Save %esp into #ebp.
     subl $8, %esp # Set up local automatic variables
 
-    movl 12(%ebp), %edx # Move the first character of the string into edx.
-    mov (%edx), %eax #Put edx into eax.
+    mov 8(%ebp), %edx # Move the first character of the string into edx.
+    addl $1, %edx
 
+    movzbl (%edx), %eax
 
-done:
     movl %ebp,%esp # restore %esp from %ebp
     popl %ebp # restore %ebp
     ret # Return to the calling function
