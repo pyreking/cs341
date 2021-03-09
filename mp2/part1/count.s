@@ -11,13 +11,18 @@ count:
 
 loop:
     movzbl (%edx), %eax
+    cmpb $0, %al
+    je done
+    addl $1, %edx
+    jmp compare
+
+compare:
     cmpb $97, %al
     je increment
-    jmp done
+    jmp loop
 
 increment:
     addl $1, %ecx
-    addl $1, %edx
     jmp loop
 
 done:
