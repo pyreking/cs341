@@ -1,0 +1,162 @@
+Script started on Wed 10 Mar 2021 03:55:36 PM EST
+tuser@tutor-vserver:~$ ls
+[0m[01;32mcount.lnx[0m  count.s     eth.txt  [01;34mlib[0m       test.c   testelf.syms  typescript
+count.o    count.syms  [01;34minclude[0m  [01;34mtestaout[0m  [01;34mtestelf[0m  [01;32mtutor.lnx[0m
+tuser@tutor-vserver:~$ ssh aguiney@users.cs.umb.edu
+aguiney@users.cs.umb.edu's password: 
+Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-65-generic x86_64)
+
+  System information as of Wed 10 Mar 2021 03:55:42 PM EST
+
+  System load:  0.12                Temperature:           46.0 C
+  Usage of /:   12.4% of 195.86GB   Processes:             574
+  Memory usage: 1%                  Users logged in:       23
+  Swap usage:   2%                  IPv4 address for eno1: 158.121.104.215
+
+5 updates can be installed immediately.
+5 of these updates are security updates.
+To see these additional updates run: apt list --upgradable
+
+*** System restart required ***
+Authorized users only.
+
+Contact: operator@cs.umb.edu or 617-287-6480
+
+2021-03-10
+  Who even cares about itserver6.cs.umb.edu now?
+  Some users still use it.  If you rely on itserver6
+  for something you can't get on pe15, then please
+  mail operator.  itserver6 will continue to run and
+  be available for a while, but we have to shut it off.
+  Real Soon Now.
+
+  - Please NEVER include your student ID or password in
+    requests or reports to operator.  We don't need to know.
+    Please ALWAYS do include your UNIX login name; that helps.
+
+Last login: Wed Mar 10 15:54:58 2021 from 76.19.99.41
+aguiney@pe15:~$ cd cs341/mp2/warmup
+aguiney@pe15:~/cs341/mp2/warmup$ ls
+tiny.s
+aguiney@pe15:~/cs341/mp2/warmup$ cat tiny.s
+    .global _start
+_start:
+    movl $8, %eax
+    addl $3, %eax
+    movl %eax, 0x200
+    int $3
+    .end
+aguiney@pe15:~/cs341/mp2/warmup$ as --32 -al -o tiny.o tiny.s
+GAS LISTING tiny.s 			page 1
+
+
+   1              	    .global _start
+   2              	_start:
+   3 0000 B8080000 	    movl $8, %eax
+   3      00
+   4 0005 83C003   	    addl $3, %eax
+   5 0008 A3000200 	    movl %eax, 0x200
+   5      00
+   6 000d CC       	    int $3
+   7              	    .end
+aguiney@pe15:~/cs341/mp2/warmup$ ld -m elf_i386 -N -Ttext 0x100100 -o tiny.lnx t iny.o
+aguiney@pe15:~/cs341/mp2/warmup$ ls
+tiny.lnx  tiny.o  tiny.s
+aguiney@pe15:~/cs341/mp2/warmup$ objdump -S tiny.lnx
+
+tiny.lnx:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+00100100 <_start>:
+  100100:	b8 08 00 00 00       	mov    $0x8,%eax
+  100105:	83 c0 03             	add    $0x3,%eax
+  100108:	a3 00 02 00 00       	mov    %eax,0x200
+  10010d:	cc                   	int3   
+aguiney@pe15:~/cs341/mp2/warmup$ exit
+logout
+Connection to users.cs.umb.edu closed.
+tuser@tutor-vserver:~$ scp aguiney@users.cs.umb.edu:cs341/mp2/warmup/tiny.* .
+aguiney@users.cs.umb.edu's password: 
+tiny.lnx                                        0%    0     0.0KB/s   --:-- ETAtiny.lnx                                      100%  456     0.5KB/s   00:00    
+tiny.o                                          0%    0     0.0KB/s   --:-- ETAtiny.o                                        100%  480     0.5KB/s   00:00    
+tiny.s                                          0%    0     0.0KB/s   --:-- ETAtiny.s                                        100%  104     0.1KB/s   00:00    
+tuser@tutor-vserver:~$ ls
+[0m[01;32mcount.lnx[0m  count.syms  [01;34mlib[0m       [01;34mtestelf[0m       tiny.o     typescript
+count.o    eth.txt     [01;34mtestaout[0m  testelf.syms  tiny.s
+count.s    [01;34minclude[0m     test.c    [01;32mtiny.lnx[0m      [01;32mtutor.lnx[0m
+tuser@tutor-vserver:~$ mtip -f tiny.lnx
+For command help, type ~?
+For help on args, rerun without args
+Code starts at 0x100100
+Using board # 1 
+Please type <CR> to confirm console setting: 
+Setting console dev to COM2Console: colour EGA+ 80x25
+COM1 at 0x03f8 (irq = 4) is a 16550A
+COM2 at 0x02f8 (irq = 3) is a 16550A
+
+                 Welcome to UMB Tutor for the PC
+   UMB Tutor is a 32-bit protected-mode PC debugger/downloader,
+       based on Linux, UMB Tutor for m68k, and remote gdb.
+UMB Tutor is free software and you are welcome to distribute copies
+of it under certain conditions.  There is no warranty for this program.
+The copyright and warranty provisions follow the Gnu general public
+license, available for view in gdb and elsewhere.  Full sources available.
+--bugs, suggestions, questions to eoneil@cs.umb.edu
+
+Exception 3 at EIP=00057a9b: Breakpoint
+Tutor> ~downloading tiny.lnx
+
+.Done.
+
+Download done, setting EIP to 100100.
+Tutor> md 100100
+00100100    b8 08 00 00 00 83 c0 03 a3 00 02 00 00 cc d4 83 ................
+Tutor> rd
+EAX=00000001 EBX=00000000   EBP=00057890
+EDX=00000000 ECX=0006967c   ESP=0005788c
+ESI=00013e10 EDI=00051ffc   EIP=00100100
+EFLAGS=0206 (IF=1 SF=0 ZF=0 CF=0 OF=0)
+Tutor> md 200
+00000200    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+Tutor> ms 200 00000000
+Tutor> md 200
+00000200    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+Tutor> rs eip 100100
+Tutor> t
+Exception 1 at EIP=00100105: Debugger interrupt
+Tutor> rd
+EAX=00000008 EBX=00000000   EBP=00057890
+EDX=00000000 ECX=0006967c   ESP=0005788c
+ESI=00013e10 EDI=00051ffc   EIP=00100105
+EFLAGS=0306 (IF=1 SF=0 ZF=0 CF=0 OF=0)
+Tutor> md 200
+00000200    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+Tutor> t
+Exception 1 at EIP=00100108: Debugger interrupt
+Tutor> rd
+EAX=0000000b EBX=00000000   EBP=00057890
+EDX=00000000 ECX=0006967c   ESP=0005788c
+ESI=00013e10 EDI=00051ffc   EIP=00100108
+EFLAGS=0302 (IF=1 SF=0 ZF=0 CF=0 OF=0)
+Tutor> md 200
+00000200    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+Tutor> t
+Exception 1 at EIP=0010010d: Debugger interrupt
+Tutor> rd
+EAX=0000000b EBX=00000000   EBP=00057890
+EDX=00000000 ECX=0006967c   ESP=0005788c
+ESI=00013e10 EDI=00051ffc   EIP=0010010d
+EFLAGS=0302 (IF=1 SF=0 ZF=0 CF=0 OF=0)
+Tutor> md 200
+00000200    0b 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+Tutor> t
+Exception 3 at EIP=0010010e: Breakpoint
+Tutor> ~q 
+Quit handler: 
+killing process 1891 Leaving board #1
+tuser@tutor-vserver:~$ exit
+exit
+
+Script done on Wed 10 Mar 2021 04:02:00 PM EST

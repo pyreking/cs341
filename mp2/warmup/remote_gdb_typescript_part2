@@ -1,0 +1,142 @@
+Script started on 2021-03-10 16:04:29-05:00 [TERM="xterm-256color" TTY="/dev/pts/0" COLUMNS="120" LINES="30"]
+]0;austin@DESKTOP-1IMOAV4: /mnt/c/Users/the-grand-line/Documents[01;32maustin@DESKTOP-1IMOAV4[00m:[01;34m/mnt/c/Users/the-grand-line/Documents[00m$ ssh tuser@192.168.80.128
+tuser@192.168.80.128's password: 
+Linux tutor-vserver 2.6.32-5-686 #1 SMP Fri Sep 9 20:51:05 UTC 2011 i686
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Wed Mar 10 16:03:46 2021
+]0;tuser@tutor-vserver: ~tuser@tutor-vserver:~$ ls
+[0m[01;32mcount.lnx[0m  count.s     eth.txt  [01;34mlib[0m       test.c   testelf.syms  tiny.o  [01;32mtutor.lnx[0m
+count.o    count.syms  [01;34minclude[0m  [01;34mtestaout[0m  [01;34mtestelf[0m  [01;32mtiny.lnx[0m      tiny.s  typescript
+]0;tuser@tutor-vserver: ~tuser@tutor-vserver:~$ gdb tiny.lnx
+GNU gdb (GDB) 7.0.1-debian
+Copyright (C) 2009 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i486-linux-gnu".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+Reading symbols from /home/tuser/tiny.lnx...(no debugging symbols found)...done.
+(gdb) tar rem /dev/ttyS0
+Remote debugging using /dev/ttyS0
+0x00100100 in _start ()
+(gdb) set $eip=0x100100
+(gdb) i reg
+eax            0x1	1
+ecx            0x6967c	431740
+edx            0x0	0
+ebx            0x0	0
+esp            0x5788c	0x5788c
+ebp            0x57890	0x57890
+esi            0x13e10	81424
+edi            0x51ffc	335868
+eip            0x100100	0x100100 <_start>
+eflags         0x206	[ PF IF ]
+cs             0x10	16
+ss             0x18	24
+ds             0x18	24
+es             0x18	24
+fs             0x18	24
+gs             0x18	24
+(gdb) x/x 0x200
+0x200:	0x00000000
+(gdb) set *(int *)0x200 = 0
+(gdb) x/x 0x200
+0x200:	0x00000000
+(gdb) set $eip = 0x100100
+(gdb) 4/[K[Kx/4i 0x100100
+0x100100 <_start>:	mov    $0x8,%eax
+0x100105 <_start+5>:	add    $0x3,%eax
+0x100108 <_start+8>:	mov    %eax,0x200
+0x10010d <_start+13>:	int3   
+(gdb) b *0x100105
+Breakpoint 1 at 0x100105
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x00100105 in _start ()
+(gdb) i reg
+eax            0x8	8
+ecx            0x6967c	431740
+edx            0x0	0
+ebx            0x0	0
+esp            0x5788c	0x5788c
+ebp            0x57890	0x57890
+esi            0x13e10	81424
+edi            0x51ffc	335868
+eip            0x100105	0x100105 <_start+5>
+eflags         0x306	[ PF TF IF ]
+cs             0x10	16
+ss             0x18	24
+ds             0x18	24
+es             0x18	24
+fs             0x18	24
+gs             0x18	24
+(gdb) b *0x100108
+Breakpoint 2 at 0x100108
+(gdb) c
+Continuing.
+
+Breakpoint 2, 0x00100108 in _start ()
+(gdb) i reg
+eax            0xb	11
+ecx            0x6967c	431740
+edx            0x0	0
+ebx            0x0	0
+esp            0x5788c	0x5788c
+ebp            0x57890	0x57890
+esi            0x13e10	81424
+edi            0x51ffc	335868
+eip            0x100108	0x100108 <_start+8>
+eflags         0x302	[ TF IF ]
+cs             0x10	16
+ss             0x18	24
+ds             0x18	24
+es             0x18	24
+fs             0x18	24
+gs             0x18	24
+(gdb) b *0x10010d
+Breakpoint 3 at 0x10010d
+(gdb) c
+Continuing.
+
+Breakpoint 3, 0x0010010d in _start ()
+(gdb) i reg
+eax            0xb	11
+ecx            0x6967c	431740
+edx            0x0	0
+ebx            0x0	0
+esp            0x5788c	0x5788c
+ebp            0x57890	0x57890
+esi            0x13e10	81424
+edi            0x51ffc	335868
+eip            0x10010d	0x10010d <_start+13>
+eflags         0x302	[ TF IF ]
+cs             0x10	16
+ss             0x18	24
+ds             0x18	24
+es             0x18	24
+fs             0x18	24
+gs             0x18	24
+(gdb) x/x 0x200
+0x200:	0x0000000b
+(gdb) q
+A debugging session is active.
+
+	Inferior 1 [Remote target] will be killed.
+
+Quit anyway? (y or n) y
+]0;tuser@tutor-vserver: ~tuser@tutor-vserver:~$ exit
+logout
+Connection to 192.168.80.128 closed.
+]0;austin@DESKTOP-1IMOAV4: /mnt/c/Users/the-grand-line/Documents[01;32maustin@DESKTOP-1IMOAV4[00m:[01;34m/mnt/c/Users/the-grand-line/Documents[00m$ exit
+exit
+
+Script done on 2021-03-10 16:09:58-05:00 [COMMAND_EXIT_CODE="0"]
