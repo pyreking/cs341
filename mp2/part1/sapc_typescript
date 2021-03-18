@@ -1,0 +1,204 @@
+Script started on Wed 10 Mar 2021 03:07:08 PM EST
+tuser@tutor-vserver:~$ ls
+eth.txt  [0m[01;34mlib[0m       test.c   testelf.syms  typescript
+[01;34minclude[0m  [01;34mtestaout[0m  [01;34mtestelf[0m  [01;32mtutor.lnx[0m
+tuser@tutor-vserver:~$ ssh aguiney@users.cs.umb.edu
+aguiney@users.cs.umb.edu's password: 
+Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-65-generic x86_64)
+
+  System information as of Wed 10 Mar 2021 03:07:13 PM EST
+
+  System load:  0.07                Temperature:           46.0 C
+  Usage of /:   12.4% of 195.86GB   Processes:             551
+  Memory usage: 1%                  Users logged in:       21
+  Swap usage:   2%                  IPv4 address for eno1: 158.121.104.215
+
+5 updates can be installed immediately.
+5 of these updates are security updates.
+To see these additional updates run: apt list --upgradable
+
+*** System restart required ***
+Authorized users only.
+
+Contact: operator@cs.umb.edu or 617-287-6480
+
+2021-01-31
+  The hostname alias users.cs.umb.edu now points to pe15
+instead of itserver6.  itserver6 will continue to run and
+be available for a while, until pe15 proves to be a fully
+suitable replacement.  You will, however, have to use its
+real name; its Fully Qualified Doman Name (FQDN) is
+itserver6.cs.umb.edu.
+
+  - Please NEVER include your student ID or password in
+    requests or reports to operator.  We don't need to know.
+    Please ALWAYS do include your UNIX login name; that helps.
+
+Last login: Wed Mar 10 15:03:18 2021 from 76.19.99.41
+aguiney@pe15:~$ cd cs341/mp2/part1
+aguiney@pe15:~/cs341/mp2/part1$ ls
+countc.c  countc.o  count.lnx  count.o	count.s  count.syms  makefile  syms
+aguiney@pe15:~/cs341/mp2/part1$ make clean
+rm -f *.o *.syms *.lnx core syms
+aguiney@pe15:~/cs341/mp2/part1$ ls
+countc.c  count.s  makefile
+aguiney@pe15:~/cs341/mp2/part1$ cat countc.c
+/* countc.c: call assembly soubroutine to count c's in string 
+    bob wilson
+      4/28/2016
+     modifed by Ron Cheung
+      3/2/2020
+ */
+
+#include <stdio.h>
+extern int count(char *string, char c);
+
+int main(void)
+{
+  char s[100];
+  char c;
+  printf("Enter a string of characters:\n");
+  scanf("%s", s);
+  printf("Enter a character to count:\n");
+  scanf("%c", &c);
+  printf("\nThe number of %c's in the string %s is %d\n", c, s, count(s, 
+c));
+  return 0;
+}
+aguiney@pe15:~/cs341/mp2/part1$ cat count.s
+    .text
+    .global count
+count:
+    pushl %ebp # Set up stack frame.
+    movl %esp,%ebp # Save %esp into #ebp.
+    subl $8, %esp # Set up local automatic variables.
+
+    movl 8(%ebp), %edx # Move the first character of the string into edx.
+    xorl %ecx, %ecx # Clear out %ecx for counting.
+
+loop:
+    movzbl (%edx), %eax # Move the value of the current character into eax
+    cmpb $0, %al # Search for a null terminator.
+    je done # Jump to done if a null terminator has been found.
+    addl $1, %edx # Move the string forward by 1.
+    jmp compare # Compare the value of %al with the target value.
+
+compare:
+    cmpb 12(%ebp), %al # Compare the value of %al with the target value.
+    je increment # Increment %ecx if the values are the same.
+    jmp loop # Go back to the main loop otherwise.
+
+increment:
+    addl $1, %ecx # Increment %ecx by 1 if the target character
+		  # has been found in %al.
+    jmp loop # Go back to the main loop.
+
+done:
+    movl %ecx, %eax # Move the letter counter into eax.
+    movl %ebp,%esp # Restore %esp from %ebp.
+    popl %ebp # Restore %ebp
+    ret # Return to the calling function
+    .end
+aguiney@pe15:~/cs341/mp2/part1$ make A=count
+as --32 -o count.o count.s
+gcc -gdwarf-2 -gstrict-dwarf -march=i586 -m32 -fno-builtin -fno-stack-protector -nostdlib     -c -Wall -I/home/cheungr/serl/tutor-linux/include -c -o countc.o countc.c
+ld -m elf_i386 -N -Ttext 100100 -o count.lnx \
+	/home/cheungr/serl/tutor-linux/libc/startup0.o /home/cheungr/serl/tutor-linux/libc/startup.o \
+	countc.o count.o /home/cheungr/serl/tutor-linux/libc/libc.a
+rm -f syms;nm -n count.lnx>count.syms;ln -s count.syms syms
+aguiney@pe15:~/cs341/mp2/part1$ ls
+countc.c  countc.o  count.lnx  count.o	count.s  count.syms  makefile  syms
+aguiney@pe15:~/cs341/mp2/part1$ exit
+logout
+Connection to users.cs.umb.edu closed.
+tuser@tutor-vserver:~$ scp aguiney@users.cs.umb.edu:cs341/mp2/part1/count.* .
+aguiney@users.cs.umb.edu's password: 
+count.lnx                                       0%    0     0.0KB/s   --:-- ETAcount.lnx                                     100%   30KB  29.9KB/s   00:00    
+count.o                                         0%    0     0.0KB/s   --:-- ETAcount.o                                       100%  600     0.6KB/s   00:00    
+count.s                                         0%    0     0.0KB/s   --:-- ETAcount.s                                       100% 1134     1.1KB/s   00:00    
+count.syms                                      0%    0     0.0KB/s   --:-- ETAcount.syms                                    100% 1072     1.1KB/s   00:00    
+tuser@tutor-vserver:~$ ls
+[0m[01;32mcount.lnx[0m  count.s     eth.txt  [01;34mlib[0m       test.c   testelf.syms  typescript
+count.o    count.syms  [01;34minclude[0m  [01;34mtestaout[0m  [01;34mtestelf[0m  [01;32mtutor.lnx[0m
+tuser@tutor-vserver:~$ mtip -f count.lnx
+For command help, type ~?
+For help on args, rerun without args
+Code starts at 0x100100
+Using board # 1 
+Please type <CR> to confirm console setting: 
+Setting console dev to COM2Console: colour EGA+ 80x25
+COM1 at 0x03f8 (irq = 4) is a 16550A
+COM2 at 0x02f8 (irq = 3) is a 16550A
+
+                 Welcome to UMB Tutor for the PC
+   UMB Tutor is a 32-bit protected-mode PC debugger/downloader,
+       based on Linux, UMB Tutor for m68k, and remote gdb.
+UMB Tutor is free software and you are welcome to distribute copies
+of it under certain conditions.  There is no warranty for this program.
+The copyright and warranty provisions follow the Gnu general public
+license, available for view in gdb and elsewhere.  Full sources available.
+--bugs, suggestions, questions to eoneil@cs.umb.edu
+
+Exception 3 at EIP=00057a9b: Breakpoint
+Tutor> ~downloading count.lnx
+
+........Done.
+
+Download done, setting EIP to 100100.
+Tutor> go 100100
+Enter a string of characters:
+austin
+Enter a character to count:
+a
+The number of a's in the string austin is 1
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter a string of characters:
+alphabet
+Enter a character to count:
+a
+The number of a's in the string alphabet is 2
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter a string of characters:
+college
+Enter a character to count:
+l
+The number of l's in the string college is 2
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter a string of characters:
+school
+Enter a character to count:
+z
+The number of z's in the string school is 0
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter a string of characters:
+homework
+Enter a character to count:
+k
+The number of k's in the string homework is 1
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter a string of characters:
+mp2
+Enter a character to count:
+2
+The number of 2's in the string mp2 is 1
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter a string of characters:
+goodbye
+Enter a character to count:
+s
+The number of s's in the string goodbye is 0
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> 
+Tutor> 
+Quit handler: 
+killing process 1789 Leaving board #1
+tuser@tutor-vserver:~$ exit
+exit
+
+Script done on Wed 10 Mar 2021 03:11:06 PM EST
