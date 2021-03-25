@@ -24,6 +24,7 @@ printbin:
 
 donibble:
     cmpb $4, %ch
+    .ret
 
     movb $0x09, %cl
 
@@ -31,12 +32,15 @@ donibble:
     and %dl, %cl
 
     cmbp $1, %cl
-    
+    movb $'1', (%eax)
 
     cmpb $0, %cl
+    movb $'0', (%eax)
 
-    
-    # movb $'1', (%eax)
+    addl $1, %eax
+    addb $1, %ch
+
+    jmp donibble
 
 done:
     movl %ebp, %esp # Restore %esp from %ebp.
