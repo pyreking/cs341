@@ -11,38 +11,34 @@ printbin:
     subl $4, %esp # Set up local automatic variable
 
 	movb 8(%ebp), %dl # Copy the hex value to %dl
-    movb %dl, %dh # Copy the hex value to $dh
     shrb $4, %dl # Get the first nibble
-    and $0x0F, %dh # Get the second nibble
+    movb %dl, %dh # Copy the first nibble to %dh
+    # and $0x0F, %dh # Get the second nibble
 
     movl $bin, %eax # Move the default string to %eax
 
     xorl %ecx, %ecx
+    movb $0x09, %cl
 
     call donibble # Process the first dibble
     jmp done # Jump to done
 
 donibble:
-    cmpb $4, %ch
-    .ret
+    sarb $1, %cl
+    and %cl, %dh
 
-    movb $0x09, %cl
-
-    sarb %ch, %cl
-    and %dl, %cl
-
-    cmbp $1, %cl
-    movb $'1', (%eax)
-
-    cmpb $0, %cl
-    movb $'0', (%eax)
+    addb $0x30, %dh
+    movb %dh, (%eax)
 
     addl $1, %eax
     addb $1, %ch
 
-    jmp donibble
+    movb %dl, %dh
+
+    ret
 
 done:
+    subl $1, %eax
     movl %ebp, %esp # Restore %esp from %ebp.
 	popl %ebp # Restore %ebp.
 	ret # Return to the calling function.
