@@ -31,7 +31,6 @@ increment:
     jmp loop1 # Jump back to the main loop.
 
 done:
-    movb $0, (%ecx)
     movl 8(%ebp), %eax # Move the copied string into eax.
     movl %ebp, %esp # Restore %esp from %ebp.
 	popl %ebp # Restore %ebp.
