@@ -43,22 +43,40 @@ printbin:
 donibble:
     andb %ch, %dl
     sarb %cl, %dl
-
     addb $0x30, %dl
-
     movb %dl, (%eax)
-
     movb %dh, %dl
     addl $1, %eax
-
-    cmpb $0, %cl
-    jz exit
-
     subb $1, %cl
     sarb $1, %ch
-    jmp donibble
 
-exit:
+    andb %ch, %dl
+    sarb %cl, %dl
+    addb $0x30, %dl
+    movb %dl, (%eax)
+    movb %dh, %dl
+    addl $1, %eax
+    subb $1, %cl
+    sarb $1, %ch
+
+    andb %ch, %dl
+    sarb %cl, %dl
+    addb $0x30, %dl
+    movb %dl, (%eax)
+    movb %dh, %dl
+    addl $1, %eax
+    subb $1, %cl
+    sarb $1, %ch
+
+    andb %ch, %dl
+    sarb %cl, %dl
+    addb $0x30, %dl
+    movb %dl, (%eax)
+    movb %dh, %dl
+    addl $1, %eax
+    subb $1, %cl
+    sarb $1, %ch
+
     ret
 
 done:
