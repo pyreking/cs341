@@ -12,33 +12,40 @@ printbin:
 
 	movb 8(%ebp), %dl # Copy the hex value to %dl
     shrb $4, %dl # Get the first nibble
-    movb %dl, %dh # Copy the first nibble to %dh
-    # and $0x0F, %dh # Get the second nibble
+    movb %dl, %dh # Copy the hex value to $dh
 
     movl $bin, %eax # Move the default string to %eax
 
     xorl %ecx, %ecx
-    movb $0x09, %cl
+    movb $3, %cl
+    movb $0x8, %ch
 
     call donibble # Process the first dibble
     jmp done # Jump to done
 
 donibble:
-    sarb $1, %cl
-    and %cl, %dh
+    andb %ch, %dl
+    sarb %cl, %dl
 
-    addb $0x30, %dh
-    movb %dh, (%eax)
+    addb $0x30, %dl
 
+    movb %dl, (%eax)
+
+    movb %dh, %dl
     addl $1, %eax
-    addb $1, %ch
 
-    movb %dl, %dh
+    cmpb $0, %cl
+    jz exit
 
+    subb $1, %cl
+    sarb $1, %ch
+    jmp donibble
+
+exit:
     ret
 
 done:
-    subl $1, %eax
+    subl $4, %eax
     movl %ebp, %esp # Restore %esp from %ebp.
 	popl %ebp # Restore %ebp.
 	ret # Return to the calling function.
