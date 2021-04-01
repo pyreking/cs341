@@ -4,12 +4,12 @@
 mystrncpy:
     pushl %ebp # Set up stack frame.
 	movl %esp, %ebp # Save %esp into %ebp.
-    subl $12, %esp
+    subl $12, %esp # Set up local automatic variables.
 
 	movl 8(%ebp), %ecx # Copy the destination string into %eax.
 	movl 12(%ebp), %eax # Copy the source string into %edx.
 
-    xor %edx, %edx
+    xor %edx, %edx # Clear out the %edx register.
 
 loop1:
     cmpb %dh, 16(%ebp) # Compare %dh with the number of characters to copy.
