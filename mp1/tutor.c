@@ -12,6 +12,8 @@
 *   Jan '96: changed prompt to PC-tutor, now mimics floppy-based Tutor
 */
 
+// Modifications by Austin Guiney for CS341 class.
+
 #include <stdio.h>
 #include "slex.h" 
 /* The preprocessor symbol SAPC is #defined in $pcinc/stdio.h.  This

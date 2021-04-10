@@ -1,3 +1,5 @@
+Name: Austin Guiney
+
 Question 1:
 
 I mostly tested the SAPC version of my program on the tutor

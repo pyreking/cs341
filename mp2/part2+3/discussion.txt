@@ -1,4 +1,5 @@
 Question 1:
 
-The tutor VM crashes if the user chooses an input string that is longer than the destination array.
-I had to completely restart the tutor VM whenever this happened.
+The tutor VM crashes if the user chooses an input string that
+is longer than the destination array. I had to completely
+restart the tutor VM whenever this happened.
