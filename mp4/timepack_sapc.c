@@ -42,6 +42,16 @@ static int tickcount;
 static int startcount;
 static int timer_running;
 
+static int start_downcount;
+static int end_downcount;
+
+static int part1;
+static int part2;
+static int part3;
+
+static double microseconds;
+static int ms;
+
 void set_timer_count(int count);
 void irq0inthandc(void);
 void smalldelay(void);
@@ -103,6 +113,12 @@ int starttimer()
 {
   startcount = tickcount;
   timer_running = TRUE;
+
+  // Record the starting downcount.
+  outpt(TIMER_CNTRL_PORT, TIMER0 |TIMER_LATCH);
+  start_downcount = inpt(TIMER0_COUNT_PORT);
+  start_downcount |= (inpt(TIMER0_COUNT_PORT) << 8);
+
   return T_OK;
 }
 
@@ -113,7 +129,22 @@ int starttimer()
  */
 int stoptimer( int *interval )
 {
-  *interval = (tickcount - startcount)*USECS_PER_TICK;
+
+  // Record the ending downcount.
+  outpt(TIMER_CNTRL_PORT, TIMER0 |TIMER_LATCH);
+  end_downcount = inpt(TIMER0_COUNT_PORT);
+  end_downcount |= (inpt(TIMER0_COUNT_PORT) << 8);
+
+  part1 = (tickcount * COUNTS_PER_TICK) + (65536 - end_downcount);
+  part2 = (startcount * COUNTS_PER_TICK) + (65536 - start_downcount);
+  part3 = part1 - part2;
+
+  microseconds = (double) part3 * (55.0 / 65536.0);
+
+  ms = (int) microseconds;
+
+  *interval = ms;
+
 #ifdef DEBUG
   printf("stoptimer reached, returning inaccurate time until fixed\n");
 #endif
