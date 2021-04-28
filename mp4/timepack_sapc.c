@@ -50,7 +50,6 @@ static int part2;
 static int part3;
 
 static double microseconds;
-static int ms;
 
 void set_timer_count(int count);
 void irq0inthandc(void);
@@ -111,13 +110,17 @@ void querytimer(int *precision, int *running)
 /* start a timed experiment: improve this along with stoptimer */
 int starttimer()
 {
+  // Get the tickcount.
   startcount = tickcount;
-  timer_running = TRUE;
 
   // Record the starting downcount.
   outpt(TIMER_CNTRL_PORT, TIMER0 |TIMER_LATCH);
   start_downcount = inpt(TIMER0_COUNT_PORT);
   start_downcount |= (inpt(TIMER0_COUNT_PORT) << 8);
+  smalldelay();
+
+  // Turn on the timer.
+  timer_running = TRUE;
 
   return T_OK;
 }
@@ -129,21 +132,24 @@ int starttimer()
  */
 int stoptimer( int *interval )
 {
-
   // Record the ending downcount.
   outpt(TIMER_CNTRL_PORT, TIMER0 |TIMER_LATCH);
   end_downcount = inpt(TIMER0_COUNT_PORT);
   end_downcount |= (inpt(TIMER0_COUNT_PORT) << 8);
+  smalldelay();
 
-  part1 = (tickcount * COUNTS_PER_TICK) + (65536 - end_downcount);
-  part2 = (startcount * COUNTS_PER_TICK) + (65536 - start_downcount);
+  // Calculate the total number of downcounts after this event.
+  part1 = (tickcount * COUNTS_PER_TICK) + (COUNTS_PER_TICK - end_downcount);
+  // Calculate the total number of downcounts before this event.
+  part2 = (startcount * COUNTS_PER_TICK) + (COUNTS_PER_TICK - start_downcount);
+  // Calculate the number of downcounts that occured during this event.
   part3 = part1 - part2;
 
-  microseconds = (double) part3 * (55.0 / 65536.0);
+  // Convert the downcounts to microseconds.
+  microseconds = (double) part3 * (55000.0 / 65536.0);
 
-  ms = (int) microseconds;
-
-  *interval = ms;
+  // Save the number of microseconds to interval.
+  *interval = (int) microseconds;
 
 #ifdef DEBUG
   printf("stoptimer reached, returning inaccurate time until fixed\n");
