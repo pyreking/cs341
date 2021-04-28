@@ -7,7 +7,7 @@ echo:
     subl $8, %esp # Set up local automatic variables.
 
     movl 8(%ebp), %edi # Put the serial port into %edi.
-    movb 12(%ebp), %bl # Put the escape character into %bl.
+    movb 12(%ebp), %ah # Put the escape character into %ah.
 
     xorl %ecx, %ecx # Clear out the %ecx register.
 
@@ -34,7 +34,7 @@ loop2:
     movl %edi, %edx # I/O data address.
     inb (%dx), %al # Move RX to %al.
     movb %al, %cl # Save RX to %cl.
-    cmpb %cl, %bl # Check for escape character.
+    cmpb %cl, %ah # Check for escape character.
     je done # Jump to done if escape character has been found.
 
     lea 5(%edi), %edx # Line status.
@@ -54,3 +54,4 @@ done:
 	popl %ebp # Restore %ebp.
 	ret # Return to the calling function.
 	.end # End the program
+    
