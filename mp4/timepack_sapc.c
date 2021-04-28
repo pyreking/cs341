@@ -38,17 +38,20 @@ typedef enum { FALSE, TRUE } Boolean;
 
 extern const IntHandler irq0inthand;
 
+// The current number of ticks.
 static int tickcount;
+// The current number of downcounts.
+static int downcount;
+
+// The starting number of downcounts before an event.
 static int startcount;
+// The ending number of downcounts after an event.
+static int endcount;
+
+// Is the timer running or not?
 static int timer_running;
 
-static int start_downcount;
-static int end_downcount;
-
-static int part1;
-static int part2;
-static int part3;
-
+// How long it took for an event to occur in microseconds.
 static double microseconds;
 
 void set_timer_count(int count);
@@ -110,14 +113,14 @@ void querytimer(int *precision, int *running)
 /* start a timed experiment: improve this along with stoptimer */
 int starttimer()
 {
-  // Get the tickcount.
-  startcount = tickcount;
-
   // Record the starting downcount.
   outpt(TIMER_CNTRL_PORT, TIMER0 |TIMER_LATCH);
-  start_downcount = inpt(TIMER0_COUNT_PORT);
-  start_downcount |= (inpt(TIMER0_COUNT_PORT) << 8);
+  downcount = inpt(TIMER0_COUNT_PORT);
+  downcount |= (inpt(TIMER0_COUNT_PORT) << 8);
   smalldelay();
+
+  // Calculate the starting count in terms of downcounts.
+  startcount = (tickcount * COUNTS_PER_TICK) + (COUNTS_PER_TICK - downcount);
 
   // Turn on the timer.
   timer_running = TRUE;
@@ -134,21 +137,18 @@ int stoptimer( int *interval )
 {
   // Record the ending downcount.
   outpt(TIMER_CNTRL_PORT, TIMER0 |TIMER_LATCH);
-  end_downcount = inpt(TIMER0_COUNT_PORT);
-  end_downcount |= (inpt(TIMER0_COUNT_PORT) << 8);
+  downcount = inpt(TIMER0_COUNT_PORT);
+  downcount |= (inpt(TIMER0_COUNT_PORT) << 8);
   smalldelay();
 
-  // Calculate the total number of downcounts after this event.
-  part1 = (tickcount * COUNTS_PER_TICK) + (COUNTS_PER_TICK - end_downcount);
-  // Calculate the total number of downcounts before this event.
-  part2 = (startcount * COUNTS_PER_TICK) + (COUNTS_PER_TICK - start_downcount);
-  // Calculate the number of downcounts that occured during this event.
-  part3 = part1 - part2;
+  // Calculate the ending count in terms of downcounts.
+  endcount = (tickcount * COUNTS_PER_TICK) + (COUNTS_PER_TICK - downcount);
 
-  // Convert the downcounts to microseconds.
-  microseconds = (double) part3 * (55000.0 / 65536.0);
+  // Calculate the total number of downcounts that occurred during this event
+  // and convert the result to microseconds.
+  microseconds = (double) (endcount - startcount) * (1000000.0 / COUNTS_PER_SEC);
 
-  // Save the number of microseconds to interval.
+  // Convert the microseconds constant to an integer and save it to interval.
   *interval = (int) microseconds;
 
 #ifdef DEBUG
