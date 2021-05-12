@@ -21,12 +21,27 @@ google:
     pushl %ebp # Set up stack frame.
 	movl %esp, %ebp # Save %esp into %ebp.
     subl $4, %esp # Set up local automatic variables.
-    lea price, %edx
-    addl $4, %edx
-    movl (%edx), %eax
-    
+    movl 8(%ebp), %edx # Put the stock price to look for into %edx.
+    lea price, %edi # Load the memory address for price into %edi.
+    xorl %ecx, %ecx # Clear out %ecx to use for counting.
+
+look_for_price:
+    addl $4, %edi # Increment the price pointer by 4.
+    movl (%edi), %eax # Move the value stored at the current pointer into %eax.
+
+    cmpl $0, %eax # Check for the stop code.
+    jz done # Jump to done if the stop code has been reached.
+
+    cmpl %eax, %edx # Compare the current price with the target price.
+    jae increment # Increment if the current price is equal or above the target price.
+
+increment:
+    addl $1, %ecx # Increment the price counter.
+    jmp look_for_price # Go back to the main loop.
+
 done:
     movl %ebp, %esp # Restore %esp from %ebp.
 	popl %ebp # Restore %ebp.
+    movl %ecx, %eax # Move the price counter into %eax.
 	ret # Return to the calling function.
 	.end # End the program
