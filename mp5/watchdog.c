@@ -12,12 +12,14 @@ extern IntHandler irq3inthand; /* the assembler envelope routine    */
 void irq3inthandc(void);  /* the C core int handler, called from envelope */
 void do_work(void);
 void shutdown(void);
+void kick_dog(void);
 extern void reboot(void);
 
 int done = 0;			/* global for communication with int hand */
 int count = 0;
 char ch;
 char save_ch = '\0';
+static int time;
 
 /* Note in our enviroment, interrupts are normally enabled in the CPU, so we
    use cli() as necessary even at the very start of the program */
@@ -65,7 +67,14 @@ void do_work(void)
         save_ch = ch;
    }
    //simulate software failure
-   while (count >9 );  /* infinite loop when receiver char count >=10 */
+   while (count > 9 );  /* infinite loop when receiver char count >=10 */
+   kick_dog();
+}
+
+void kick_dog(void) {
+  stoptimer(&time);
+  inittimer();
+  starttimer();
 }
 
 void shutdown(void){
