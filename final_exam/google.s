@@ -19,7 +19,7 @@ price:    .long 1260    #11/1/19 price
           .text
 google:
     pushl %ebp          # Set up stack frame.
-	movl %esp, %ebp     # Save %esp into %ebp.
+    movl %esp, %ebp     # Save %esp into %ebp.
     subl $4, %esp       # Set up local automatic variables.
     movl 8(%ebp), %edx  # Put the stock price to look for into %edx.
     lea price, %edi     # Load the memory address for price into %edi.
@@ -50,7 +50,7 @@ increment:
 
 done:
     movl %ebp, %esp     # Restore %esp from %ebp.
-	popl %ebp           # Restore %ebp.
+    popl %ebp           # Restore %ebp.
     movl %ecx, %eax     # Move the price counter into %eax.
 	ret                 # Return to the calling function.
 	.end                # End the program.
