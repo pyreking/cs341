@@ -52,5 +52,5 @@ done:
     movl %ebp, %esp     # Restore %esp from %ebp.
     popl %ebp           # Restore %ebp.
     movl %ecx, %eax     # Move the price counter into %eax.
-	ret                 # Return to the calling function.
-	.end                # End the program.
+    ret                 # Return to the calling function.
+    .end                # End the program.
