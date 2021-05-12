@@ -18,30 +18,39 @@ price:    .long 1260    #11/1/19 price
           .long 0       #stop 
           .text
 google:
-    pushl %ebp # Set up stack frame.
-	movl %esp, %ebp # Save %esp into %ebp.
-    subl $4, %esp # Set up local automatic variables.
-    movl 8(%ebp), %edx # Put the stock price to look for into %edx.
-    lea price, %edi # Load the memory address for price into %edi.
-    xorl %ecx, %ecx # Clear out %ecx to use for counting.
+    pushl %ebp          # Set up stack frame.
+	movl %esp, %ebp     # Save %esp into %ebp.
+    subl $4, %esp       # Set up local automatic variables.
+    movl 8(%ebp), %edx  # Put the stock price to look for into %edx.
+    lea price, %edi     # Load the memory address for price into %edi.
+    addl $8, %edi       # Skip the last two months of 2019.
 
-look_for_price:
-    addl $4, %edi # Increment the price pointer by 4.
-    movl (%edi), %eax # Move the value stored at the current pointer into %eax.
+    xorl %ecx, %ecx     # Clear out %ecx to use for counting.
 
-    cmpl $0, %eax # Check for the stop code.
-    jz done # Jump to done if the stop code has been reached.
+    movl (%edi), %eax   # Move the value stored at the current pointer into %eax.
 
-    cmpl %eax, %edx # Compare the current price with the target price.
-    jae increment # Increment if the current price is equal or above the target price.
+    cmpl %edx, %eax
+    jae increment       # Increment if the current price is equal or above the target price.
+
+check_for_price:
+    addl $4, %edi       # Increment the price pointer by 4.
+    movl (%edi), %eax   # Move the value stored at the current pointer into %eax.
+
+    cmpl $0, %eax       # Check for the stop code.
+    jz done             # Jump to done if the stop code has been reached.
+    
+    cmpl %edx, %eax     # Compare the target price with the current price.
+    jae increment       # Increment if the current price is equal or above the target price.
+
+    jmp check_for_price # Go back to the main loop.
 
 increment:
-    addl $1, %ecx # Increment the price counter.
-    jmp look_for_price # Go back to the main loop.
+    addl $1, %ecx       # Increment the price counter.
+    jmp check_for_price # Go back to the main loop.
 
 done:
-    movl %ebp, %esp # Restore %esp from %ebp.
-	popl %ebp # Restore %ebp.
-    movl %ecx, %eax # Move the price counter into %eax.
-	ret # Return to the calling function.
-	.end # End the program
+    movl %ebp, %esp     # Restore %esp from %ebp.
+	popl %ebp           # Restore %ebp.
+    movl %ecx, %eax     # Move the price counter into %eax.
+	ret                 # Return to the calling function.
+	.end                # End the program.
