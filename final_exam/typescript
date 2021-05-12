@@ -1,0 +1,235 @@
+Script started on Wed 12 May 2021 07:09:38 PM EDT
+tuser@tutor-vserver:~$ ls
+eth.txt  [0m[01;34minclude[0m  [01;34mlib[0m  [01;34mtestaout[0m  test.c  [01;34mtestelf[0m  testelf.syms  typescript
+tuser@tutor-vserver:~$ ssh aguiney@users.cs.umb.edu
+aguiney@users.cs.umb.edu's password: 
+Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-70-generic x86_64)
+
+  System information as of Wed 12 May 2021 07:10:09 PM EDT
+
+  System load:  0.01                Temperature:           46.0 C
+  Usage of /:   14.6% of 195.86GB   Processes:             548
+  Memory usage: 1%                  Users logged in:       25
+  Swap usage:   0%                  IPv4 address for eno1: 158.121.104.215
+
+Contact: operator@cs.umb.edu or 617-287-6480
+Last login: Wed May 12 18:53:49 2021 from 108.1.153.226
+aguiney@pe15:~$ cd cs341/final_exam
+aguiney@pe15:~/cs341/final_exam$ ls -al
+total 64
+drwxr-xr-x  2 aguiney cs341-1G  4096 May 12 19:08  .
+drwxrws--- 11 aguiney cs341-1G  4096 May 12 15:48  ..
+-rw-r--r--  1 aguiney cs341-1G 43719 May 12 09:13 'CS341_TakeHome_Final_Examination_Spring 2021_print.docx'
+-rw-r--r--  1 aguiney cs341-1G   358 May 12 17:32  googlec.c
+-rw-r--r--  1 aguiney cs341-1G  2234 May 12 18:58  google.s
+-rw-r--r--  1 aguiney cs341-1G  2082 May 12 09:13  makefile
+aguiney@pe15:~/cs341/final_exam$ cat googlec.c
+/*googlec.c: C driver for the stock analysis function
+*/
+
+#include <stdio.h>
+extern int google(int number);
+
+int main()
+{
+  int n, number;
+  printf("Enter the stock price to compare:\n");
+  scanf("%d", &number);
+  
+  n = google(number);
+  printf("Number of months that goog is equal or above the price of %d in 2020 is:  %d \n", number, n);
+  return 0;  
+}
+
+aguiney@pe15:~/cs341/final_exam$ cat google.s
+#GOOG Stock price analysis assembly language program
+# google.s
+#
+          .globl google 
+          .data
+price:    .long 1260    #11/1/19 price
+          .long 1289    #12/1/19 price
+          .long 1337    #1/1/20 price
+          .long 1434    #2/1/20 price
+          .long 1389    #3/1/20 price
+          .long 1105    #4/1/20 price
+          .long 1320    #5/1/20 price
+          .long 1431    #6/1/20 price
+          .long 1438    #7/1/20 price
+          .long 1482    #8/1/20 price
+          .long 1634    #9/1/20 price
+          .long 1490    #10/1/20 price
+          .long 0       #stop 
+          .text
+google:
+    pushl %ebp          # Set up stack frame.
+    movl %esp, %ebp     # Save %esp into %ebp.
+    subl $4, %esp       # Set up local automatic variables.
+    movl 8(%ebp), %edx  # Put the stock price to look for into %edx.
+    lea price, %edi     # Load the memory address for price into %edi.
+    addl $8, %edi       # Skip the last two months of 2019.
+
+    xorl %ecx, %ecx     # Clear out %ecx to use for counting.
+
+    movl (%edi), %eax   # Move the value stored at the current pointer into %eax.
+
+    cmpl %edx, %eax     # Compare the target price with the current price.
+    jae increment       # Increment %ecx if the current price is equal or above the target price.
+
+check_for_price:        # The main loop for the rest of the prices.
+    addl $4, %edi       # Increment the price pointer by 4.
+    movl (%edi), %eax   # Move the value stored at the current pointer into %eax.
+
+    cmpl $0, %eax       # Check for the stop code.
+    jz done             # Jump to done if the stop code has been reached.
+    
+    cmpl %edx, %eax     # Compare the target price with the current price.
+    jae increment       # Increment if the current price is equal or above the target price.
+
+    jmp check_for_price # Go back to the main loop.
+
+increment:
+    addl $1, %ecx       # Increment the price counter.
+    jmp check_for_price # Go back to the main loop.
+
+done:
+    movl %ebp, %esp     # Restore %esp from %ebp.
+    popl %ebp           # Restore %ebp.
+    movl %ecx, %eax     # Move the price counter into %eax.
+    ret                 # Return to the calling function.
+    .end                # End the program.
+aguiney@pe15:~/cs341/final_exam$ make clean
+rm -f *.o *.syms *.lnx core syms
+aguiney@pe15:~/cs341/final_exam$ ls -al
+total 64
+drwxr-xr-x  2 aguiney cs341-1G  4096 May 12 19:08  .
+drwxrws--- 11 aguiney cs341-1G  4096 May 12 15:48  ..
+-rw-r--r--  1 aguiney cs341-1G 43719 May 12 09:13 'CS341_TakeHome_Final_Examination_Spring 2021_print.docx'
+-rw-r--r--  1 aguiney cs341-1G   358 May 12 17:32  googlec.c
+-rw-r--r--  1 aguiney cs341-1G  2234 May 12 18:58  google.s
+-rw-r--r--  1 aguiney cs341-1G  2082 May 12 09:13  makefile
+aguiney@pe15:~/cs341/final_exam$ make A=google
+as --32 -o google.o google.s
+gcc -gdwarf-2 -gstrict-dwarf -march=i586 -m32 -fno-builtin -fno-stack-protector -nostdlib     -c -Wall -I/home/cheungr/serl/tutor-linux/include -c -o googlec.o googlec.c
+ld -m elf_i386 -N -Ttext 100100 -o google.lnx \
+	/home/cheungr/serl/tutor-linux/libc/startup0.o /home/cheungr/serl/tutor-linux/libc/startup.o \
+	googlec.o google.o /home/cheungr/serl/tutor-linux/libc/libc.a
+rm -f syms;nm -n google.lnx>google.syms;ln -s google.syms syms
+aguiney@pe15:~/cs341/final_exam$ ls -al
+total 112
+drwxr-xr-x  2 aguiney cs341-1G  4096 May 12 19:10  .
+drwxrws--- 11 aguiney cs341-1G  4096 May 12 15:48  ..
+-rw-r--r--  1 aguiney cs341-1G 43719 May 12 09:13 'CS341_TakeHome_Final_Examination_Spring 2021_print.docx'
+-rw-r--r--  1 aguiney cs341-1G   358 May 12 17:32  googlec.c
+-rw-r--r--  1 aguiney ugrad     6480 May 12 19:10  googlec.o
+-rwxr-xr-x  1 aguiney ugrad    30648 May 12 19:10  google.lnx
+-rw-r--r--  1 aguiney ugrad      720 May 12 19:10  google.o
+-rw-r--r--  1 aguiney cs341-1G  2234 May 12 18:58  google.s
+-rw-r--r--  1 aguiney ugrad     1082 May 12 19:10  google.syms
+-rw-r--r--  1 aguiney cs341-1G  2082 May 12 09:13  makefile
+lrwxrwxrwx  1 aguiney ugrad       11 May 12 19:10  syms -> google.syms
+aguiney@pe15:~/cs341/final_exam$ exit
+logout
+Connection to users.cs.umb.edu closed.
+tuser@tutor-vserver:~$ scp aguiney@users.cs.umb.edu:cs341/final_exam/google.* .
+aguiney@users.cs.umb.edu's password: 
+google.lnx                                      0%    0     0.0KB/s   --:-- ETAgoogle.lnx                                    100%   30KB  29.9KB/s   00:00    
+google.o                                        0%    0     0.0KB/s   --:-- ETAgoogle.o                                      100%  720     0.7KB/s   00:00    
+google.s                                        0%    0     0.0KB/s   --:-- ETAgoogle.s                                      100% 2234     2.2KB/s   00:00    
+google.syms                                     0%    0     0.0KB/s   --:-- ETAgoogle.syms                                   100% 1082     1.1KB/s   00:00    
+tuser@tutor-vserver:~$ ls
+eth.txt     google.o  google.syms  [0m[01;34mlib[0m       test.c   testelf.syms
+[01;32mgoogle.lnx[0m  google.s  [01;34minclude[0m      [01;34mtestaout[0m  [01;34mtestelf[0m  typescript
+tuser@tutor-vserver:~$ mtip -f google.lnx
+For command help, type ~?
+For help on args, rerun without args
+Code starts at 0x100100
+Using board # 1 
+Please type <CR> to confirm console setting: 
+Setting console dev to COM2Console: colour EGA+ 80x25
+COM1 at 0x03f8 (irq = 4) is a 16550A
+COM2 at 0x02f8 (irq = 3) is a 16550A
+
+                 Welcome to UMB Tutor for the PC
+   UMB Tutor is a 32-bit protected-mode PC debugger/downloader,
+       based on Linux, UMB Tutor for m68k, and remote gdb.
+UMB Tutor is free software and you are welcome to distribute copies
+of it under certain conditions.  There is no warranty for this program.
+The copyright and warranty provisions follow the Gnu general public
+license, available for view in gdb and elsewhere.  Full sources available.
+--bugs, suggestions, questions to eoneil@cs.umb.edu
+
+Exception 3 at EIP=00057a9b: Breakpoint
+Tutor> ~downloading google.lnx
+
+........Done.
+
+Download done, setting EIP to 100100.
+Tutor> go 100100
+Enter the stock price to compare:
+1104
+Number of months that goog is equal or above the price of 1104 in 2020 is:  10 
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter the stock price to compare:
+1105
+Number of months that goog is equal or above the price of 1105 in 2020 is:  10 
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter the stock price to compare:
+1106
+Number of months that goog is equal or above the price of 1106 in 2020 is:  9 
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter the stock price to compare:
+1200
+Number of months that goog is equal or above the price of 1200 in 2020 is:  9 
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter the stock price to compare:
+1300
+Number of months that goog is equal or above the price of 1300 in 2020 is:  9 
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter the stock price to compare:
+1400
+Number of months that goog is equal or above the price of 1400 in 2020 is:  6 
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter the stock price to compare:
+1500
+Number of months that goog is equal or above the price of 1500 in 2020 is:  1 
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter the stock price to compare:
+1600
+Number of months that goog is equal or above the price of 1600 in 2020 is:  1 
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter the stock price to compare:
+1634
+Number of months that goog is equal or above the price of 1634 in 2020 is:  1 
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter the stock price to compare:
+1635
+Number of months that goog is equal or above the price of 1635 in 2020 is:  0 
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter the stock price to compare:
+1700
+Number of months that goog is equal or above the price of 1700 in 2020 is:  0 
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Enter the stock price to compare:
+2000
+Number of months that goog is equal or above the price of 2000 in 2020 is:  0 
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> 
+Tutor> 
+Quit handler: 
+killing process 1800 Leaving board #1
+tuser@tutor-vserver:~$ exit
+exit
+
+Script done on Wed 12 May 2021 07:14:07 PM EDT
