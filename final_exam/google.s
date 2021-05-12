@@ -29,10 +29,10 @@ google:
 
     movl (%edi), %eax   # Move the value stored at the current pointer into %eax.
 
-    cmpl %edx, %eax
-    jae increment       # Increment if the current price is equal or above the target price.
+    cmpl %edx, %eax     # Compare the target price with the current price.
+    jae increment       # Increment %ecx if the current price is equal or above the target price.
 
-check_for_price:
+check_for_price:        # The main loop for the rest of the prices.
     addl $4, %edi       # Increment the price pointer by 4.
     movl (%edi), %eax   # Move the value stored at the current pointer into %eax.
 
