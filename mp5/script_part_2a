@@ -1,0 +1,492 @@
+Script started on Thu 06 May 2021 06:32:03 PM EDT
+tuser@tutor-vserver:~$ ls
+[0m[01;32mcharGen[0m   charGen1.c  eth.txt  [01;34mlib[0m       test.c   testelf.syms
+[01;32mcharGen1[0m  charGen.c   [01;34minclude[0m  [01;34mtestaout[0m  [01;34mtestelf[0m  typescript
+tuser@tutor-vserver:~$ ssh aguiney@users.cs.umb.edu
+aguiney@users.cs.umb.edu's password: 
+Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-70-generic x86_64)
+
+  System information as of Thu 06 May 2021 06:32:34 PM EDT
+
+  System load:  0.04                Temperature:           45.0 C
+  Usage of /:   14.4% of 195.86GB   Processes:             547
+  Memory usage: 1%                  Users logged in:       23
+  Swap usage:   0%                  IPv4 address for eno1: 158.121.104.215
+
+Contact: operator@cs.umb.edu or 617-287-6480
+Last login: Thu May  6 18:30:19 2021 from 108.1.153.226
+aguiney@pe15:~$ cd cs341/mp5
+aguiney@pe15:~/cs341/mp5$ ls -al
+total 452
+drwxrwsr-x  2 aguiney cs341-1G   4096 May  6 18:31 .
+drwxrws--- 10 aguiney cs341-1G   4096 Apr 27 20:12 ..
+-rw-r--r--  1 aguiney cs341-1G   8743 Apr 30 15:04 charGen1.c
+-rw-r--r--  1 aguiney cs341-1G   1708 Apr 30 15:04 makefile
+-rw-r--r--  1 aguiney cs341-1G  50810 Apr 30 15:04 mp5.docx
+-rw-r--r--  1 aguiney cs341-1G 271618 Apr 30 15:04 mp5.pdf
+-rw-r--r--  1 aguiney cs341-1G    524 May  6 18:31 reboot.o
+-rw-r--r--  1 aguiney cs341-1G    151 Apr 30 15:04 reboot.s
+-rw-r--r--  1 aguiney cs341-1G  13708 Apr 30 15:04 Rubric.docx
+-rw-r--r--  1 aguiney cs341-1G   1952 May  3 12:52 script_part_1
+lrwxrwxrwx  1 aguiney cs341-1G     13 May  6 18:31 syms -> watchdog.syms
+-rw-r--r--  1 aguiney cs341-1G   2272 Apr 30 15:04 timepack.h
+-rw-r--r--  1 aguiney cs341-1G   4282 May  3 19:36 timepack_sapc.c
+-rw-r--r--  1 aguiney cs341-1G   9640 May  6 18:31 timepack_sapc.o
+-rw-r--r--  1 aguiney cs341-1G   2739 May  6 18:31 watchdog.c
+-rwxr-xr-x  1 aguiney cs341-1G  36228 May  6 18:31 watchdog.lnx
+-rw-r--r--  1 aguiney cs341-1G   8448 May  6 18:31 watchdog.o
+-rw-r--r--  1 aguiney cs341-1G   1986 May  6 18:31 watchdog.syms
+aguiney@pe15:~/cs341/mp5$ cat reboot.s
+   # function to restart the application
+.globl reboot
+   .text
+reboot:
+   jmp 0x100100                    #rreboot code
+   ret              
+   .end
+
+aguiney@pe15:~/cs341/mp5$ cat watchdog.c
+/* watchdog.c - program to simulate a watchdog timer
+   using code from typewr.c
+   The needed interrupt envelope routines irq3int, etc. are in           
+   the library, and sti, cli, pic_enable_irq, etc., are there too.     */
+#include <stdio.h>
+#include <serial.h>
+#include <cpu.h>
+#include <pic.h>
+#include "timepack.h"
+
+extern IntHandler irq3inthand; /* the assembler envelope routine    */
+void irq3inthandc(void);  /* the C core int handler, called from envelope */
+void do_work(void);
+void shutdown(void);
+void kick_dog(void);
+extern void reboot(void);
+
+int done = 0;			/* global for communication with int hand */
+int count = 0;
+char ch;
+char save_ch = '\0';
+
+/* Note in our enviroment, interrupts are normally enabled in the CPU, so we
+   use cli() as necessary even at the very start of the program */
+int main(void)
+{
+
+  /* init global explicitly, so program works properly on reruns */
+  done = 0;			
+				 
+  cli();			/* disable ints while setting them up */
+
+  // set up interrupt for COM2 port
+  printf("Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...\n");
+  set_intr_gate(COM2_IRQ+IRQ_TO_INT_N_SHIFT, &irq3inthand);
+
+  printf("Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)\n");
+  pic_enable_irq(COM2_IRQ);
+
+  printf("enabling receiver interrupts in UART...\n");
+  outpt(COM2_BASE+UART_IER, UART_IER_RDI); /* RDI = receiver data int */
+ //
+ // insert code to set up timer interrupt
+  inittimer();
+  sti();
+ //
+ // enter into the main function
+   printf("...done, entering almost-infinite loop\n");
+   starttimer();
+   while (!done)			/* loop almost forever...*/
+   {
+     do_work();                         /* loop to do work */
+   }
+  //
+  // All done
+    shutdown();
+  return 0;
+}
+
+// Function to take character received and display them with comments
+void do_work(void)
+{
+   if(save_ch != ch)
+   { 
+        printf("new char received is= %c\n", ch);
+        save_ch = ch;
+   }
+   //simulate software failure
+   while (count > 9 );  /* infinite loop when receiver char count >=10 */
+}
+
+void shutdown(void){
+  /* here when user types 'q': shutdown ints we started up */
+  cli();
+  pic_disable_irq(COM2_IRQ);	/* done with irq 3 in PIC */
+  outpt(COM2_BASE+UART_IER, 0); /* stop UART ints */
+  sti();			/* but other ints still there */
+}
+
+/* this is called from irq3inthand, the assembler interrupt envelope routine */
+/* that saves the C scratch regs on the stack, restores them after this,  */
+/* then does the iret instruction.                                        */
+void irq3inthandc(void)
+{
+  count++;
+  pic_end_int();		/* notify PIC that its part is done */
+  ch = inpt(COM2_BASE+UART_RX);	/* read char (ACKs UART too) */
+  if (ch == 'z')
+    done = 1;			/* set global flag to let main know */
+}
+aguiney@pe15:~/cs341/mp5$ cat timepack_sapc.c
+
+/******************************************************************
+*
+*   file:      timepack_sapc.c
+*   author:    Betty O'Neil
+*   date:      '88 (MECB)
+*
+*   revisions: Ethan Bolker, October 1990 to #include header file timepack.h
+*              Betty O'Neil, March 1992 to add inittimer
+*              Betty O'Neil, S96 to SAPC
+*              Bob Wilson, spring 2014
+*
+*   SAPC timing package.
+*   Link with code containing calls to stoptimer, starttimer
+*
+*   To do:
+*      Implement static flag set when timer is running
+*        (for now everything returns T_OK)
+*/
+
+/* constants and prototypes for timing package primitives */
+#include <stdio.h>
+#include "timepack.h"
+#include <timer.h>
+#include <pic.h>
+#include <cpu.h>
+
+typedef enum { FALSE, TRUE } Boolean;
+
+/* PC's 8254 timer: one tick consists of 64K counts at 1193182 counts/sec */
+#define COUNTS_PER_SEC 1193182 
+#define COUNTS_PER_TICK (64*1024)
+/* This is a double constant--see K&R, p. 37.  Doubles are great for
+ conversion constants.  Just convert back to int at end if apprpriate */
+#define USECS_PER_TICK (1000000.0*COUNTS_PER_TICK/COUNTS_PER_SEC)
+/* precision = time between possible values, in us */
+#define TIMER_PRECISION 1
+
+extern const IntHandler irq0inthand;
+
+static int tickcount;
+static int startcount;
+static int timer_running;
+
+void set_timer_count(int count);
+void irq0inthandc(void);
+void smalldelay(void);
+extern void reboot(void);
+
+/* set timer ticking.  This is called only once at start of program */
+void inittimer()
+{
+  tickcount = 0;
+#ifdef DEBUG
+  printf("Disabling interrupts in CPU while setting them up\n");
+#endif
+  cli();
+#ifdef DEBUG  
+  printf("Setting interrupt gate for timer, irq 0\n");
+#endif
+  /* irq 0 maps to slot n = 0x20 in IDT for linux setup */
+  set_intr_gate(TIMER0_IRQ+IRQ_TO_INT_N_SHIFT, &irq0inthand);
+#ifdef DEBUG
+  printf("Commanding PIC to interrupt CPU for irq 0\n");
+#endif
+  pic_enable_irq(TIMER0_IRQ);
+  timer_running = 0;		/* starts running at call to starttimer */
+#ifdef DEBUG
+  printf("Commanding timer to generate a pulse train using max count\n");
+#endif
+  set_timer_count(0);	
+#ifdef DEBUG
+  printf("Enabling interrupts in CPU\n");
+#endif
+  sti();
+}
+
+/* This is NEEDED: future ints could find bogus int handler after this
+ * code is overwritten by next download or whatever, requiring reboot.
+ * This is called once at end of program.
+ */
+void shutdowntimer()
+{
+  cli();
+#ifdef DEBUG
+  printf("Commanding PIC to shut off irq 0 to CPU\n");
+#endif
+  pic_disable_irq(TIMER0_IRQ);	/* disallow irq 0 ints to get to CPU */
+  sti();
+}
+
+/*  for the SAPC case:  microsecond precision (though not microsecond
+ *  *accuracy* because of various overhead times involved)
+*/
+void querytimer(int *precision, int *running)
+{
+   *precision = TIMER_PRECISION;
+   *running = timer_running;
+   return;
+}
+
+/* start a timed experiment: improve this along with stoptimer */
+int starttimer()
+{
+  startcount = tickcount;
+  timer_running = TRUE;
+  return T_OK;
+}
+
+/* temporary crude way: better to read the counter and add in the downcounts
+ * (converted to us) since the last tick, and similarly change starttime 
+ * to record the starting downcount, and adjust for another partial tick.
+ * Remember that printf takes a *lot* of time!!  Don't do it during experiments.
+ */
+int stoptimer( int *interval )
+{
+  *interval = (tickcount - startcount)*USECS_PER_TICK;
+#ifdef DEBUG
+  printf("stoptimer reached, returning inaccurate time until fixed\n");
+#endif
+  timer_running = FALSE;
+  return T_OK;
+}
+
+/* about 10 us on a SAPC (400Mhz Pentium) */
+void smalldelay(void)
+{
+  int i;
+  
+  for (i=0;i<1000;i++)
+    ;
+}
+
+/* Set up timer to count down from given count, then send a tick interrupt, */
+/* over and over. A count of 0 sets max count, 65536 = 2**16 */
+void set_timer_count(int count)
+{
+  outpt(TIMER_CNTRL_PORT, TIMER0|TIMER_SET_ALL|TIMER_MODE_RATEGEN);
+  outpt(TIMER0_COUNT_PORT,count&0xff); /* set LSB here */
+  outpt(TIMER0_COUNT_PORT,count>>8); /* and MSB here */
+  smalldelay();			/* give the timer a moment to init. */
+}
+
+/* timer interrupt handler */
+void irq0inthandc(void)
+{
+  pic_end_int();		/* notify PIC that its part is done */
+  tickcount++;			/* count the tick in global var */
+
+  if (tickcount % 100 == 0) {
+    reboot();
+  }
+//  kprintf("Interrupt ISR\n");
+}
+aguiney@pe15:~/cs341/mp5$ make clean
+rm -f *.o *.syms *.lnx core syms
+aguiney@pe15:~/cs341/mp5$ ls -al
+total 384
+drwxrwsr-x  2 aguiney cs341-1G   4096 May  6 18:32 .
+drwxrws--- 10 aguiney cs341-1G   4096 Apr 27 20:12 ..
+-rw-r--r--  1 aguiney cs341-1G   8743 Apr 30 15:04 charGen1.c
+-rw-r--r--  1 aguiney cs341-1G   1708 Apr 30 15:04 makefile
+-rw-r--r--  1 aguiney cs341-1G  50810 Apr 30 15:04 mp5.docx
+-rw-r--r--  1 aguiney cs341-1G 271618 Apr 30 15:04 mp5.pdf
+-rw-r--r--  1 aguiney cs341-1G    151 Apr 30 15:04 reboot.s
+-rw-r--r--  1 aguiney cs341-1G  13708 Apr 30 15:04 Rubric.docx
+-rw-r--r--  1 aguiney cs341-1G   1952 May  3 12:52 script_part_1
+-rw-r--r--  1 aguiney cs341-1G   2272 Apr 30 15:04 timepack.h
+-rw-r--r--  1 aguiney cs341-1G   4282 May  3 19:36 timepack_sapc.c
+-rw-r--r--  1 aguiney cs341-1G   2739 May  6 18:31 watchdog.c
+aguiney@pe15:~/cs341/mp5$ make C=watchdog
+as --32 -o reboot.o reboot.s
+gcc -gdwarf-2 -gstrict-dwarf -march=i586 -m32 -fno-builtin -fno-stack-protector -nostdlib     -c -Wall -I/home/cheungr/serl/tutor-linux/include -c -o watchdog.o watchdog.c
+gcc -gdwarf-2 -gstrict-dwarf -march=i586 -m32 -fno-builtin -fno-stack-protector -nostdlib     -c -Wall -I/home/cheungr/serl/tutor-linux/include -c -o timepack_sapc.o timepack_sapc.c
+ld -m elf_i386 -N -Ttext 100100 -o watchdog.lnx \
+	/home/cheungr/serl/tutor-linux/libc/startup0.o /home/cheungr/serl/tutor-linux/libc/startup.o \
+	watchdog.o reboot.o timepack_sapc.o /home/cheungr/serl/tutor-linux/libc/libc.a
+rm -f syms;nm -n watchdog.lnx>watchdog.syms;ln -s watchdog.syms syms
+aguiney@pe15:~/cs341/mp5$ ls -al
+total 452
+drwxrwsr-x  2 aguiney cs341-1G   4096 May  6 18:33 .
+drwxrws--- 10 aguiney cs341-1G   4096 Apr 27 20:12 ..
+-rw-r--r--  1 aguiney cs341-1G   8743 Apr 30 15:04 charGen1.c
+-rw-r--r--  1 aguiney cs341-1G   1708 Apr 30 15:04 makefile
+-rw-r--r--  1 aguiney cs341-1G  50810 Apr 30 15:04 mp5.docx
+-rw-r--r--  1 aguiney cs341-1G 271618 Apr 30 15:04 mp5.pdf
+-rw-r--r--  1 aguiney cs341-1G    524 May  6 18:33 reboot.o
+-rw-r--r--  1 aguiney cs341-1G    151 Apr 30 15:04 reboot.s
+-rw-r--r--  1 aguiney cs341-1G  13708 Apr 30 15:04 Rubric.docx
+-rw-r--r--  1 aguiney cs341-1G   1952 May  3 12:52 script_part_1
+lrwxrwxrwx  1 aguiney cs341-1G     13 May  6 18:33 syms -> watchdog.syms
+-rw-r--r--  1 aguiney cs341-1G   2272 Apr 30 15:04 timepack.h
+-rw-r--r--  1 aguiney cs341-1G   4282 May  3 19:36 timepack_sapc.c
+-rw-r--r--  1 aguiney cs341-1G   9640 May  6 18:33 timepack_sapc.o
+-rw-r--r--  1 aguiney cs341-1G   2739 May  6 18:31 watchdog.c
+-rwxr-xr-x  1 aguiney cs341-1G  36164 May  6 18:33 watchdog.lnx
+-rw-r--r--  1 aguiney cs341-1G   8372 May  6 18:33 watchdog.o
+-rw-r--r--  1 aguiney cs341-1G   1970 May  6 18:33 watchdog.syms
+aguiney@pe15:~/cs341/mp5$ exit
+logout
+Connection to users.cs.umb.edu closed.
+tuser@tutor-vserver:~$ scp aguiney@users.cs.umb.edu:cs341/mp5/watchdog.* .
+aguiney@users.cs.umb.edu's password: 
+watchdog.c                                      0%    0     0.0KB/s   --:-- ETAwatchdog.c                                    100% 2739     2.7KB/s   00:00    
+watchdog.lnx                                    0%    0     0.0KB/s   --:-- ETAwatchdog.lnx                                  100%   35KB  35.3KB/s   00:00    
+watchdog.o                                      0%    0     0.0KB/s   --:-- ETAwatchdog.o                                    100% 8372     8.2KB/s   00:00    
+watchdog.syms                                   0%    0     0.0KB/s   --:-- ETAwatchdog.syms                                 100% 1970     1.9KB/s   00:00    
+tuser@tutor-vserver:~$ mtip -f watchdog.lnx
+For command help, type ~?
+For help on args, rerun without args
+Code starts at 0x100100
+Using board # 1 
+Please type <CR> to confirm console setting: 
+Setting console dev to COM2Console: colour EGA+ 80x25
+COM1 at 0x03f8 (irq = 4) is a 16550A
+COM2 at 0x02f8 (irq = 3) is a 16550A
+
+                 Welcome to UMB Tutor for the PC
+   UMB Tutor is a 32-bit protected-mode PC debugger/downloader,
+       based on Linux, UMB Tutor for m68k, and remote gdb.
+UMB Tutor is free software and you are welcome to distribute copies
+of it under certain conditions.  There is no warranty for this program.
+The copyright and warranty provisions follow the Gnu general public
+license, available for view in gdb and elsewhere.  Full sources available.
+--bugs, suggestions, questions to eoneil@cs.umb.edu
+
+Exception 3 at EIP=00057a9b: Breakpoint
+Tutor> ~downloading watchdog.lnx
+
+........Done.
+
+Download done, setting EIP to 100100.
+Tutor> go 100100
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+new char received is= A
+new char received is= B
+new char received is= C
+new char received is= D
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+new char received is= E
+new char received is= F
+new char received is= G
+new char received is= 0
+new char received is= 1
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+new char received is= 2
+new char received is= 3
+new char received is= 4
+new char received is= 5
+new char received is= 6
+new char received is= a
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+new char received is= b
+new char received is= c
+new char received is= d
+new char received is= e
+new char received is= f
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+new char received is= g
+new char received is= M
+new char received is= N
+new char received is= O
+new char received is= P
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+new char received is= Q
+new char received is= R
+new char received is= S
+new char received is= 0
+new char received is= 1
+new char received is= 2
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+new char received is= 3
+new char received is= 4
+new char received is= 5
+new char received is= 6
+new char received is= m
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+new char received is= n
+new char received is= o
+new char received is= p
+new char received is= q
+new char received is= r
+new char received is= s
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+new char received is= A
+new char received is= B
+new char received is= C
+new char received is= D
+new char received is= E
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+new char received is= F
+new char received is= G
+new char received is= 0
+new char received is= 1
+new char received is= 2
+new char received is= 3
+Calling set_intr_gate (irq = 3, n = 0x23) to arm interrupt...
+Commanding PIC to interrupt CPU for irq 3 (COM2_IRQ)
+enabling receiver interrupts in UART...
+...done, entering almost-infinite loop
+new char received is= 4
+new char received is= 
+new char received is= 5
+
+Quit handler: 
+killing process 1950 Leaving board #1
+tuser@tutor-vserver:~$ ^C
+tuser@tutor-vserver:~$ exit
+exit
+
+Script done on Thu 06 May 2021 06:36:03 PM EDT
